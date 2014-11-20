@@ -1,0 +1,1 @@
+g++ -ggdb `pkg-config --cflags opencv` -o `basename track.cpp .cpp` track.cpp `pkg-config --libs opencv`
