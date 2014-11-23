@@ -1,0 +1,5 @@
+CFLAGS = `pkg-config --cflags opencv2`
+LIBS = `pkg-config --libs opencv2`
+
+track : track.cpp
+	g++ $(CFLAGS) $(LIBS) -o $@ $<
