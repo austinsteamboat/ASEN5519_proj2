@@ -53,7 +53,7 @@ class ViconStreamer:
     def connect(self, host, port):
         print ">> Connecting..."
         self.sock.connect((host, port))
-        print ">> Requesting stream info..."
+        print '>> Requesting stream info...'
         # Mysteriously, the ordering of the following two bytes is the opposite
         # of what the Vicon documentation claims it is
         self._viconSend([1,0])

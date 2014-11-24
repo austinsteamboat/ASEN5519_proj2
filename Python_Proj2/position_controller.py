@@ -100,7 +100,7 @@ class PositionController:
         """
 
         #Calculate delta t and set previous time ot current time
-        current_time = ((time.time()-self.timer)*10)
+        current_time = ((time.time() - self.timer) * 10)
         delta_t = current_time - self.previous_time_alt
         self.previous_time_alt = current_time
 
@@ -117,7 +117,7 @@ class PositionController:
 
         #Get error I
         if abs(self.error_alt) < 1000:
-            self.I_error_alt = self.I_error_alt + self.error_alt*delta_t
+            self.I_error_alt += self.error_alt * delta_t
         else:
             pass
 
@@ -148,11 +148,11 @@ class PositionController:
         """
 
         #Get rid of bad inputs
-        if target_heading > math.pi or target_heading < math.pi*-1:
+        if target_heading > math.pi or target_heading < math.pi * -1:
             return 0
 
         #Calculate delta t and set previous time ot current time
-        current_time = ((time.time()-self.timer)*10)
+        current_time = ((time.time() - self.timer) * 10)
         delta_t = current_time - self.previous_time_yaw
         self.previous_time_yaw = current_time
 

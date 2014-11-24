@@ -49,8 +49,8 @@ def curses_print(string, line, col):
 		return
 
 	if line > 22 or line < 0:
-		return
 
+		return
 	#Print to screen using curses
 	if col == 0:
 		screen.addstr(line, 0, string)
