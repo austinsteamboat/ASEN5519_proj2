@@ -36,20 +36,26 @@ def get_object(frame):
 	_,contours,_ = cv2.findContours(mask,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
 	cv2.drawContours(frame, contours, -1, (0,255,0), 3)
 	num_objects = len(contours)
+	area_max = 0
+	cnt_max=0
 	if (num_objects>0):
-		cnt = contours[0]
-		area = cv2.contourArea(cnt)
+		for i in range(0,num_objects):
+			cnt = contours[i]
+			area = cv2.contourArea(cnt)
+			if area>area_max:
+				area_max=area
+				cnt_max=cnt
 		#perimeter = cv2.arcLength(cnt, True)
-		moment = cv2.moments(cnt)
+		moment = cv2.moments(cnt_max)
 		cx = int(moment['m10']/moment['m00'])
 		cy = int(moment['m01']/moment['m00'])
 	else:
-		cnt = 0
-		area = 0
+		cnt_max = 0
+		area_max = 0
 		cx = 0
 		cy = 0
 	cv2.circle(frame,(cx,cy),5,(255,0,0),-1)
-	print 'Num Objs: ',repr(num_objects),' Cx: ',repr(cx),' Cy: ',repr(cy),' Area: ',repr(area)
+	print 'Num Objs: ',repr(num_objects),' Cx: ',repr(cx),' Cy: ',repr(cy),' Area: ',repr(area_max)
 	#image_data = [cx ,cy, area, min_con_x, max_con_x, min_con_y, max_con_y, out_of_bounds, num_objects]
 
 
