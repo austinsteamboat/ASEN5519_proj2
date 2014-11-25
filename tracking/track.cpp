@@ -18,7 +18,7 @@ using namespace std;
     namedWindow("Control", WINDOW_NORMAL); //create a window called "Control"
 
   int iLowH = 0;
- int iHighH = 24;
+ int iHighH = 179;
 
   int iLowS = 204; 
  int iHighS = 255;

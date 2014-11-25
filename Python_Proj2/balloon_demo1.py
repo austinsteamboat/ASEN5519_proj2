@@ -80,11 +80,10 @@ while vidro.current_rc_channels[4] > 1600 and flight_ready == True:
 				if (time.time() % 1) == 0:
 					seq2_cnt += 1
 					yaw +=1
-                                        if yaw > 2*math.pi:
-                                                yaw-=(2*math.pi)
-					if seq1_cnt == 10:
-						sequence = 3
-
+                                        if seq2_cnt==20:
+                                                sequence = 3
+                                                
+        
                
 		#Land
 		if sequence == 3:
