@@ -32,6 +32,7 @@ time_diff = 0
 yaw = 0
 print('Heading to while')
 while flight_ready == True:#1600 vidro.current_rc_channels[4] > 0 and 
+	update_mavlink(controller)
 	print('RC 5 '+repr(vidro.current_rc_channels[4])+' RC 6 '+repr(vidro.current_rc_channels[5]))
 	#Reset of errors after each time control loop finishes
 	controller.I_error_alt = 0
