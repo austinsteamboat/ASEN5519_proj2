@@ -28,8 +28,10 @@ seq2_cnt = 0
 seq3_cnt = 0
 yaw = 0
 print('Heading to while')
+
 while vidro.current_rc_channels[4] > 1600 and flight_ready == True:
-	update_mavlink(controller) # Grab updated rc channel values
+	print('RC 5 '+repr(vidro.current_rc_channels[4])+' RC 6 '+repr(vidro.current_rc_channels[5]))
+	vidro.update_mavlink() # Grab updated rc channel values
 	#Reset of errors after each time control loop finishes
 	controller.I_error_alt = 0
 	controller.I_error_pitch = 0
@@ -48,7 +50,7 @@ while vidro.current_rc_channels[4] > 1600 and flight_ready == True:
 		controller.update_gains()
 
 	while vidro.current_rc_channels[5] > 1600:
-		update_mavlink(controller) # grab updated value for rc channels I think
+		vidro.update_mavlink() # Grab updated rc channel values
 		#On ground -> Takeoff to 1 m
 		if sequence == 0:
 			error_z = controller.rc_alt(1000)
@@ -80,10 +82,11 @@ while vidro.current_rc_channels[4] > 1600 and flight_ready == True:
 			error_x_y = controller.rc_xy(0, 0)
 			if error_z < 50 and error_yaw < 1 and error_pitch < 50 and error_roll < 50: # if we've closed the error, update
 				seq2_cnt += 1
-				if seq2_cnt==5 # once we've closed the loop 5 times, advance!
+				if seq2_cnt==5: # once we've closed the loop 5 times, advance!
 					sequence = 3
-		
-		if sequence == 3: land
+
+		# Land
+		if sequence == 3: 
 			controller.vidro.set_rc_throttle(controller,0)#not 100% on this
 			sequence = 3
 
