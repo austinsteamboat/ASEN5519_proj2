@@ -30,8 +30,8 @@ yaw = 0
 print('Heading to while')
 
 while vidro.current_rc_channels[4] > 1600 and flight_ready == True:
-	print('RC 5 '+repr(vidro.current_rc_channels[4])+' RC 6 '+repr(vidro.current_rc_channels[5]))
-	vidro.update_mavlink() # Grab updated rc channel values
+	#print('RC 5 '+repr(vidro.current_rc_channels[4])+' RC 6 '+repr(vidro.current_rc_channels[5]))
+	vidro.update_mavlink() # Grab updated rc channel values. This is the right command for it, but it doesn't always seem to update RC channels
 	#Reset of errors after each time control loop finishes
 	controller.I_error_alt = 0
 	controller.I_error_pitch = 0
@@ -87,7 +87,8 @@ while vidro.current_rc_channels[4] > 1600 and flight_ready == True:
 
 		# Land
 		if sequence == 3: 
-			controller.vidro.set_rc_throttle(controller,0)#not 100% on this
+			controller.vidro.set_rc_throttle(0)# it'll round it to minimum which is like 1100
+			#print(' RC 1 '+repr(vidro.current_rc_channels[0])+' RC 2 '+repr(vidro.current_rc_channels[1])+' RC 3 '+repr(vidro.current_rc_channels[2])+' RC 4 '+repr(vidro.current_rc_channels[3])+' RC 5 '+repr(vidro.current_rc_channels[4])+' RC 6 '+repr(vidro.current_rc_channels[5]))
 			sequence = 3
 
 
