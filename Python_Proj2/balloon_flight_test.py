@@ -29,6 +29,7 @@ seq3_cnt = 0
 pos_bound_err = 300
 yaw_bound_err = 0.5
 yaw = 0
+reset_val = 1
 print('Heading to while')
 while(1):
 ##        try:
@@ -37,6 +38,14 @@ while(1):
 ##                print('RC 5 Vidro Update '+repr(vidro.current_rc_channels[4])+' RC 6 Vidro Update '+repr(vidro.current_rc_channels[5]))
 	vidro.update_mavlink() # Grab updated rc channel values. This is the right command for it, but it doesn't always seem to update RC channels
 	while vidro.current_rc_channels[4] > 1600 and flight_ready == True:
+		if(reset_val):
+			print 'RESET!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
+			controller.vidro.rc_throttle_reset()
+			controller.vidro.rc_yaw_reset()
+			controller.vidro.rc_pitch_reset()
+			controller.vidro.rc_roll_reset()
+			reset_val = 0
+			
 		#print('RC 5 '+repr(vidro.current_rc_channels[4])+' RC 6 '+repr(vidro.current_rc_channels[5]))
 		vidro.update_mavlink() # Grab updated rc channel values. This is the right command for it, but it doesn't always seem to update RC channels
 		#Reset of errors after each time control loop finishes
@@ -109,7 +118,9 @@ while(1):
 				#print(' RC 1 '+repr(vidro.current_rc_channels[0])+' RC 2 '+repr(vidro.current_rc_channels[1])+' RC 3 '+repr(vidro.current_rc_channels[2])+' RC 4 '+repr(vidro.current_rc_channels[3])+' RC 5 '+repr(vidro.current_rc_channels[4])+' RC 6 '+repr(vidro.current_rc_channels[5]))
 				sequence = 3
 
-
+			if vidro.current_rc_channels[5] < 1600:
+				reset_val = 1
+				print('Gonna Reset!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
 
 
 
