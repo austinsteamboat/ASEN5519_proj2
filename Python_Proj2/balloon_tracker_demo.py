@@ -13,13 +13,13 @@ import cv2
 
 cap = cv2.VideoCapture(1)
 
-H_lower = 157
-S_lower = 149
-V_lower = 67
+H_lower = 0 #157
+S_lower = 149 #149
+V_lower = 67 #67
 
-H_upper = 186
-S_upper = 255
-V_upper = 255
+H_upper = 14 # 186
+S_upper = 255 # 255
+V_upper = 255 # 255
 
 def get_object(frame):
 	hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
