@@ -26,8 +26,8 @@ seq0_cnt = 0
 seq1_cnt = 0
 seq2_cnt = 0
 seq3_cnt = 0
-pos_bound_err = 300
-yaw_bound_err = 0.5
+pos_bound_err = 100
+yaw_bound_err = 0.2
 yaw = 0
 reset_val = 1
 print('Heading to while')
@@ -60,6 +60,7 @@ while(1):
 		vidro.previous_error_yaw = 0
 		vidro.previous_error_roll = 0
 		vidro.previous_error_pitch = 0
+		desc_alt = 1000
 		print('outer loop')
 		#Update of gains before going into control loop
 		if vidro.current_rc_channels[5] > 1600:
@@ -71,23 +72,23 @@ while(1):
 			if sequence == 0:
 				error_z = controller.rc_alt(1000)
 				error_yaw = controller.rc_yaw(0)
-				error_x_y = controller.rc_xy(0, 0)
-				err_x = error_x_y[0]
-				err_y = error_x_y[1]
+				#error_x_y = controller.rc_xy(0, 0)
+				err_x = 0#error_x_y[0]
+				err_y = 0#error_x_y[1]
 				print('Seq: '+repr(sequence)+' Err Z: '+repr(error_z)+' Err Yaw: '+repr(error_yaw)+' Err X: '+repr(err_x)+' Err y: '+repr(err_y))
 				if ((abs(error_z) < pos_bound_err) and (abs(error_yaw) < yaw_bound_err) and (abs(err_y) < pos_bound_err) and (abs(err_x) < pos_bound_err)):# Closes Error for takeoff
 					seq0_cnt += 1 # just update the sequence if the loop is closed for 3 software loops
 					print('update')
-					if seq0_cnt == 3:
-						sequence = 1
+					if seq0_cnt == 10:
+						sequence = 2
 
 			#Turn in center of space
 			if sequence == 1:
 				error_z = controller.rc_alt(1000)
 				error_yaw = controller.rc_yaw(yaw)
-				error_x_y = controller.rc_xy(0,0)
-				err_x = error_x_y[0]
-				err_y = error_x_y[1]
+				#error_x_y = controller.rc_xy(0,0)
+				err_x = 0#error_x_y[0]
+				err_y = 0#error_x_y[1]
 				print('Seq: '+repr(sequence)+' Err Z: '+repr(error_z)+' Err Yaw: '+repr(error_yaw)+' Err X: '+repr(err_x)+' Err y: '+repr(err_y))
 				if ((abs(error_z) < pos_bound_err) and (abs(error_yaw) < yaw_bound_err) and (abs(err_y) < pos_bound_err) and (abs(err_x) < pos_bound_err)):# Closes Error for takeoff
 					yaw +=1
@@ -100,16 +101,18 @@ while(1):
 						
 			#Move to landing position
 			if sequence == 2:
-				error_z = controller.rc_alt(170)
+				error_z = controller.rc_alt(desc_alt)
 				error_yaw = controller.rc_yaw(0)
-				error_x_y = controller.rc_xy(0, 0)
-				err_x = error_x_y[0]
-				err_y = error_x_y[1]
+				#error_x_y = controller.rc_xy(0, 0)
+				err_x = 0#error_x_y[0]
+				err_y = 0#error_x_y[1]
 				print('Seq: '+repr(sequence)+' Err Z: '+repr(error_z)+' Err Yaw: '+repr(error_yaw)+' Err X: '+repr(err_x)+' Err y: '+repr(err_y))
 				if ((abs(error_z) < pos_bound_err) and (abs(error_yaw) < yaw_bound_err) and (abs(err_y) < pos_bound_err) and (abs(err_x) < pos_bound_err)):# Closes Error for takeoff
 					print('update')
 					seq2_cnt += 1
-					if seq2_cnt==5: # once we've closed the loop 5 times, advance!
+					#if seq2_cnt==3: # once we've closed the loop 5 times, advance!
+					desc_alt-=1
+					if(desc_alt<170):
 						sequence = 3
 
 			# Land
