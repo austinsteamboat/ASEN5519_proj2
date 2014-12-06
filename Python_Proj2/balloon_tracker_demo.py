@@ -63,7 +63,7 @@ def get_camera_frame():
 	global frame
 	global new_frame
 	_, frame = cap.read()
-	frame=cv2.flip(frame, flipMode=-1)
+	frame = cv2.flip(frame,-1,-1)
 	new_frame = True
 
 while(1):
