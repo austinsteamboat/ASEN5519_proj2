@@ -76,7 +76,7 @@ def get_camera_frame():
 ###############################
 
 vidro = Vidro(False, 1)
-flight_ready = vidro.connect()
+#flight_ready = vidro.connect()
 controller = PositionController(vidro)
 start_time = time.time()
 # Load gains
@@ -142,7 +142,7 @@ print('Heading to main loop')
 #####################
 
 while(1):
-	vidro.update_mavlink() # Grab updated rc channel values. This is the right command for it, but it doesn't always seem to update RC channels
+	#vidro.update_mavlink() # Grab updated rc channel values. This is the right command for it, but it doesn't always seem to update RC channels
 	# Armed Loop
 	# Pilot still has overrides	
 	while vidro.current_rc_channels[4] > 1600 and flight_ready == True:
