@@ -180,7 +180,7 @@ while(1):
 			vidro.update_mavlink() # Grab updated rc channel values
 			print('Auto Loop')
 
-			# Seq. 0: Takeoff to 1 m and origin ###############=> Separate these commands maybe....maybe in all of them			
+			# Seq. 0: Takeoff to 1 m and origin ###############=> Separate these commands maybe....maybe in all of them, just make a positioning thread maybe			
 			if sequence == 0:
 				# Assign Commands
 				alt_com = take_off_alt
