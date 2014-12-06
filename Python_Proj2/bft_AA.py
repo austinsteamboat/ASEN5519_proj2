@@ -180,7 +180,7 @@ while(1):
 			vidro.update_mavlink() # Grab updated rc channel values
 			print('Auto Loop')
 
-			# Seq. 0: Takeoff to 1 m and origin ###############=> Separate these commands maybe....			
+			# Seq. 0: Takeoff to 1 m and origin ###############=> Separate these commands maybe....maybe in all of them, just make a positioning thread maybe			
 			if sequence == 0:
 				# Assign Commands
 				alt_com = take_off_alt
@@ -213,13 +213,14 @@ while(1):
 					yaw_com +=yaw_coarse_step
 					yaw_pos = vidro.get_yaw_radians() # Grab current yaw val, assuming picture taking could be a while so grab it here son
 					get_camera_frame()
-					cx_val,cy_val,area_val,num_objecst_val = get_object(frame)
+					cx_val,cy_val,area_val,num_objects_val = get_object(frame)
 					if(num_objects_val>0):
 						balloon_found = True # If we have something, we'll assume we've found the balloon
 					if(yaw_pos<0):
 						yaw_pos+=(2*math.pi) # Keep our bearing estimate between 0 and 2pi
 					if(area_val>area_max): # If our current imag has a bigger red area, update our estimate
-						img_balloon_ber = (cx_val-cx_mid)*cx_fov*0.5 # Basic camera model, somebody check this
+						area_max_val = area_val						
+						img_balloon_ber = (cx_val-cx_mid)*cx_fov/640 # Basic camera model, somebody check this
 						max_bear_val = yaw_pos+img_balloon_ber
 						if(max_bear_val<0):
 							max_bear_val+=(2*math.pi) # Keep it positive
@@ -247,9 +248,9 @@ while(1):
 					# Check to see if we still see the Balloon					
 					yaw_pos = vidro.get_yaw_radians() # Update our radians					
 					get_camera_frame()
-					cx_val,cy_val,area_val,num_objecst_val = get_object(frame)
+					cx_val,cy_val,area_val,num_objects_val = get_object(frame)
 					if(num_objects_val>0):					# If we've seen something, adjust our pointing
-						img_balloon_ber = (cx_val-cx_mid)*cx_fov*0.5    # Basic camera model, somebody check this
+						img_balloon_ber = (cx_val-cx_mid)*cx_fov/640    # Basic camera model, somebody check this
 						if(abs(img_balloon_ber)<yaw_bound_err):		# If we're in the error, advance and update bear est.							
 							sequence=3
 							max_bear_val = yaw_pos+img_balloon_ber
@@ -263,6 +264,7 @@ while(1):
 					else:
 						balloon_found = False 				# If we don't see anything go back to coarse search
 						sequence = 1
+						area_max_val = 0
 			
 			#Seq. 3: Guidance
 			if sequence == 3:
@@ -282,9 +284,9 @@ while(1):
 					# Check to see if we still see the Balloon					
 					yaw_pos = vidro.get_yaw_radians() # Update our radians					
 					get_camera_frame()
-					cx_val,cy_val,area_val,num_objecst_val = get_object(frame)
+					cx_val,cy_val,area_val,num_objects_val = get_object(frame)
 					if(num_objects_val>0):					# If we've seen something, adjust our pointing
-						img_balloon_ber = (cx_val-cx_mid)*cx_fov*0.5    # Basic camera model, somebody check this
+						img_balloon_ber = (cx_val-cx_mid)*cx_fov/640   # Basic camera model, somebody check this
 						max_bear_val = yaw_pos+img_balloon_ber
 						if(max_bear_val<0):
 							max_bear_val+=(2*math.pi) 		# Keep it positive
@@ -303,6 +305,7 @@ while(1):
 					else:
 						balloon_found = False 				# If we don't see anything go back to coarse search
 						sequence = 1
+						area_max_val = 0						
 			
 			#Seq. 4: Terminal
 			if sequence == 4:
@@ -331,7 +334,7 @@ while(1):
 				controller.vidro.rc_roll_reset()
 				reset_val = 0
 				vidro.close()
-				break				
+				break	# this break won't break all the loops, just the auto loop			
 
 			if vidro.current_rc_channels[5] < 1600:
 				reset_val = 1
