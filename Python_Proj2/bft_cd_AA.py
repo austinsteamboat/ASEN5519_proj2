@@ -145,17 +145,13 @@ while(1):
 	#vidro.update_mavlink() # Grab updated rc channel values. This is the right command for it, but it doesn't always seem to update RC channels
 	# Armed Loop
 	# Pilot still has overrides	
-	while vidro.current_rc_channels[4] > 1600 and flight_ready == True:
+	while True:
 		if(reset_val):
 			print 'Reset Over-rides'
-			controller.vidro.rc_throttle_reset()
-			controller.vidro.rc_yaw_reset()
-			controller.vidro.rc_pitch_reset()
-			controller.vidro.rc_roll_reset()
 			reset_val = 0
 			
 		#print('RC 5 '+repr(vidro.current_rc_channels[4])+' RC 6 '+repr(vidro.current_rc_channels[5]))
-		vidro.update_mavlink() # Grab updated rc channel values. This is the right command for it, but it doesn't always seem to update RC channels
+		#vidro.update_mavlink() # Grab updated rc channel values. This is the right command for it, but it doesn't always seem to update RC channels
 		#Reset of errors after each time control loop finishes
 		controller.I_error_alt = 0
 		controller.I_error_pitch = 0
@@ -171,21 +167,17 @@ while(1):
 		
 		
 		print('Armed Loop')
-		#Update of gains before going into control loop
-		if vidro.current_rc_channels[5] > 1600:
-			controller.update_gains() # Potentially move this into the main loop
-
 		# Auto Loop
-		while vidro.current_rc_channels[5] > 1600:
-			vidro.update_mavlink() # Grab updated rc channel values
+		while True:
+			#vidro.update_mavlink() # Grab updated rc channel values
 			print('Auto Loop')
 
 			# Seq. 0: Takeoff to 1 m and origin ###############=> Separate these commands maybe....			
 			if sequence == 0:
 				# Assign Commands
 				alt_com = take_off_alt
-				error_z = controller.rc_alt(alt_com)
-				error_yaw = controller.rc_yaw(yaw_com)
+				error_z = 0
+				error_yaw = 0
 				#error_x_y = controller.rc_xy(x_com, y_com)
 				err_x = 0#error_x_y[0]
 				err_y = 0#error_x_y[1]
@@ -197,21 +189,16 @@ while(1):
 
 			#Seq. 1: Coarse Search
 			if sequence == 1:
-				error_z = controller.rc_alt(alt_com)
-				error_yaw = controller.rc_yaw(yaw_com)
+				error_z = 0
+				error_yaw = 0
 				#error_x_y = controller.rc_xy(x_com, y_com)
 				err_x = 0#error_x_y[0]
 				err_y = 0#error_x_y[1]
 				print('Seq: '+repr(sequence)+' Err Z: '+repr(round(error_z))+' Err Yaw: '+repr(round(error_yaw))+' Err X: '+repr(round(err_x))+' Err y: '+repr(round(err_y)))
 				if ((abs(error_z) < pos_bound_err) and (abs(error_yaw) < yaw_bound_err) and (abs(err_y) < pos_bound_err) and (abs(err_x) < pos_bound_err)):# Closes Error 
-					# Hold her steady while we img proc					
-					vidro.set_rc_throttle(vidro.base_rc_throttle)
-					vidro.set_rc_roll(vidro.base_rc_roll)
-					vidro.set_rc_pitch(vidro.base_rc_pitch)
-					vidro.set_rc_yaw(vidro.base_rc_yaw)					
 					# Run img proc					
 					yaw_com +=yaw_coarse_step
-					yaw_pos = vidro.get_yaw_radians() # Grab current yaw val, assuming picture taking could be a while so grab it here son
+					yaw_pos = 0 # Grab current yaw val, assuming picture taking could be a while so grab it here son
 					get_camera_frame()
 					cx_val,cy_val,area_val,num_objecst_val = get_object(frame)
 					if(num_objects_val>0):
@@ -231,21 +218,15 @@ while(1):
 						
 			#Seq. 2: Fine Search ######################## Could just kill this sequence....
 			if sequence == 2:
-				error_z = controller.rc_alt(alt_com)
-				error_yaw = controller.rc_yaw(yaw_com)
+				error_z = 0
+				error_yaw = 0
 				#error_x_y = controller.rc_xy(x_com, y_com)
 				err_x = 0#error_x_y[0]
 				err_y = 0#error_x_y[1]
 				print('Seq: '+repr(sequence)+' Err Z: '+repr(round(error_z))+' Err Yaw: '+repr(round(error_yaw))+' Err X: '+repr(round(err_x))+' Err y: '+repr(round(err_y)))
 				if ((abs(error_z) < pos_bound_err) and (abs(error_yaw) < yaw_bound_err) and (abs(err_y) < pos_bound_err) and (abs(err_x) < pos_bound_err)):# Closes Error 
-					# Hold her steady while we img proc					
-					vidro.set_rc_throttle(vidro.base_rc_throttle)
-					vidro.set_rc_roll(vidro.base_rc_roll)
-					vidro.set_rc_pitch(vidro.base_rc_pitch)
-					vidro.set_rc_yaw(vidro.base_rc_yaw)					
-					# Run img proc						
 					# Check to see if we still see the Balloon					
-					yaw_pos = vidro.get_yaw_radians() # Update our radians					
+					yaw_pos = 0 # Update our radians					
 					get_camera_frame()
 					cx_val,cy_val,area_val,num_objecst_val = get_object(frame)
 					if(num_objects_val>0):					# If we've seen something, adjust our pointing
@@ -266,21 +247,15 @@ while(1):
 			
 			#Seq. 3: Guidance
 			if sequence == 3:
-				error_z = controller.rc_alt(alt_com)
-				error_yaw = controller.rc_yaw(yaw_com)
+				error_z = 0#controller.rc_alt(alt_com)
+				error_yaw = 0#controller.rc_yaw(yaw_com)
 				#error_x_y = controller.rc_xy(x_com, y_com)
 				err_x = 0#error_x_y[0]
 				err_y = 0#error_x_y[1]
 				print('Seq: '+repr(sequence)+' Err Z: '+repr(round(error_z))+' Err Yaw: '+repr(round(error_yaw))+' Err X: '+repr(round(err_x))+' Err y: '+repr(round(err_y)))
 				if ((abs(error_z) < pos_bound_err) and (abs(error_yaw) < yaw_bound_err) and (abs(err_y) < pos_bound_err) and (abs(err_x) < pos_bound_err)):# Closes Error 
-					# Hold her steady while we img proc					
-					vidro.set_rc_throttle(vidro.base_rc_throttle)
-					vidro.set_rc_roll(vidro.base_rc_roll)
-					vidro.set_rc_pitch(vidro.base_rc_pitch)
-					vidro.set_rc_yaw(vidro.base_rc_yaw)					
-					# Run img proc						
 					# Check to see if we still see the Balloon					
-					yaw_pos = vidro.get_yaw_radians() # Update our radians					
+					yaw_pos = 0#vidro.get_yaw_radians() # Update our radians					
 					get_camera_frame()
 					cx_val,cy_val,area_val,num_objecst_val = get_object(frame)
 					if(num_objects_val>0):					# If we've seen something, adjust our pointing
@@ -293,8 +268,8 @@ while(1):
 							sequence = 4 
 						else:						# Else, update x,y com
 							# Grab our current x,y position          
-							x_pos=vidro.get_position()[0]            
-							y_pos=vidro.get_position()[1]            
+							x_pos=0#vidro.get_position()[0]            
+							y_pos=0#vidro.get_position()[1]            
 							# Calculate step towards balloon         
 							d_x = guid_adv*math.cos(max_bear_val)    
 							d_y = guid_adv*math.sin(max_bear_val)    
@@ -311,8 +286,8 @@ while(1):
 
 			#Move to landing position
 			if sequence == 5:
-				error_z = controller.rc_alt(alt_com)
-				error_yaw = controller.rc_yaw(0)
+				error_z = 0#controller.rc_alt(alt_com)
+				error_yaw = 0#controller.rc_yaw(0)
 				#error_x_y = controller.rc_xy(x_com, y_com)
 				err_x = 0#error_x_y[0]
 				err_y = 0#error_x_y[1]
@@ -324,13 +299,13 @@ while(1):
 
 			# Land
 			if sequence == 6: 
-				controller.vidro.set_rc_throttle(0)# it'll round it to minimum which is like 1100
-				controller.vidro.rc_throttle_reset()
-				controller.vidro.rc_yaw_reset()
-				controller.vidro.rc_pitch_reset()
-				controller.vidro.rc_roll_reset()
+				#controller.vidro.set_rc_throttle(0)# it'll round it to minimum which is like 1100
+				#controller.vidro.rc_throttle_reset()
+				#controller.vidro.rc_yaw_reset()
+				#controller.vidro.rc_pitch_reset()
+				#controller.vidro.rc_roll_reset()
 				reset_val = 0
-				vidro.close()
+				#vidro.close()
 				break				
 
 			if vidro.current_rc_channels[5] < 1600:
