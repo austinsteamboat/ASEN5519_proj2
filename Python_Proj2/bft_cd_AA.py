@@ -170,7 +170,7 @@ while(1):
 		# Auto Loop
 		while True:
 			#vidro.update_mavlink() # Grab updated rc channel values
-			print('Auto Loop')
+			print'Auto Loop Seq: '+repr(sequence)
 
 			# Seq. 0: Takeoff to 1 m and origin ###############=> Separate these commands maybe....			
 			if sequence == 0:
@@ -181,7 +181,7 @@ while(1):
 				#error_x_y = controller.rc_xy(x_com, y_com)
 				err_x = 0#error_x_y[0]
 				err_y = 0#error_x_y[1]
-				print('Seq: '+repr(sequence)+' Err Z: '+repr(round(error_z))+' Err Yaw: '+repr(round(error_yaw))+' Err X: '+repr(round(err_x))+' Err y: '+repr(round(err_y)))
+				#print('Seq: '+repr(sequence)+' Err Z: '+repr(round(error_z))+' Err Yaw: '+repr(round(error_yaw))+' Err X: '+repr(round(err_x))+' Err y: '+repr(round(err_y)))
 				if ((abs(error_z) < pos_bound_err) and (abs(error_yaw) < yaw_bound_err) and (abs(err_y) < pos_bound_err) and (abs(err_x) < pos_bound_err)):# Closes Error 
 					seq0_cnt += 1 # just update the sequence if the loop is closed for 3 software loops
 					if seq0_cnt == 10:
@@ -194,19 +194,21 @@ while(1):
 				#error_x_y = controller.rc_xy(x_com, y_com)
 				err_x = 0#error_x_y[0]
 				err_y = 0#error_x_y[1]
-				print('Seq: '+repr(sequence)+' Err Z: '+repr(round(error_z))+' Err Yaw: '+repr(round(error_yaw))+' Err X: '+repr(round(err_x))+' Err y: '+repr(round(err_y)))
+				#print('Seq: '+repr(sequence)+' Err Z: '+repr(round(error_z))+' Err Yaw: '+repr(round(error_yaw))+' Err X: '+repr(round(err_x))+' Err y: '+repr(round(err_y)))
 				if ((abs(error_z) < pos_bound_err) and (abs(error_yaw) < yaw_bound_err) and (abs(err_y) < pos_bound_err) and (abs(err_x) < pos_bound_err)):# Closes Error 
 					# Run img proc					
 					yaw_com +=yaw_coarse_step
 					yaw_pos = 0 # Grab current yaw val, assuming picture taking could be a while so grab it here son
 					get_camera_frame()
-					cx_val,cy_val,area_val,num_objecst_val = get_object(frame)
+					cx_val,cy_val,area_val,num_objects_val = get_object(frame)
+					print 'Yaw: ',repr(yaw_com),' Cx: '+repr(cx_val)+' Cy: '+repr(cy_val)+' Area: '+repr(area_val)+' Nobj: '+repr(num_objects_val)
 					if(num_objects_val>0):
 						balloon_found = True # If we have something, we'll assume we've found the balloon
 					if(yaw_pos<0):
 						yaw_pos+=(2*math.pi) # Keep our bearing estimate between 0 and 2pi
-					if(area_val>area_max): # If our current imag has a bigger red area, update our estimate
-						img_balloon_ber = (cx_val-cx_mid)*cx_fov*0.5 # Basic camera model, somebody check this
+					if(area_val>area_max_val): # If our current imag has a bigger red area, update our estimate
+						area_max_val = area_val
+						img_balloon_ber = (cx_val-cx_mid)*cx_fov/640 # Basic camera model, somebody check this
 						max_bear_val = yaw_pos+img_balloon_ber
 						if(max_bear_val<0):
 							max_bear_val+=(2*math.pi) # Keep it positive
@@ -223,14 +225,15 @@ while(1):
 				#error_x_y = controller.rc_xy(x_com, y_com)
 				err_x = 0#error_x_y[0]
 				err_y = 0#error_x_y[1]
-				print('Seq: '+repr(sequence)+' Err Z: '+repr(round(error_z))+' Err Yaw: '+repr(round(error_yaw))+' Err X: '+repr(round(err_x))+' Err y: '+repr(round(err_y)))
+				#print('Seq: '+repr(sequence)+' Err Z: '+repr(round(error_z))+' Err Yaw: '+repr(round(error_yaw))+' Err X: '+repr(round(err_x))+' Err y: '+repr(round(err_y)))
 				if ((abs(error_z) < pos_bound_err) and (abs(error_yaw) < yaw_bound_err) and (abs(err_y) < pos_bound_err) and (abs(err_x) < pos_bound_err)):# Closes Error 
 					# Check to see if we still see the Balloon					
 					yaw_pos = 0 # Update our radians					
 					get_camera_frame()
-					cx_val,cy_val,area_val,num_objecst_val = get_object(frame)
+					cx_val,cy_val,area_val,num_objects_val = get_object(frame)
+					print 'Yaw: ',repr(yaw_com),' Cx: '+repr(cx_val)+' Cy: '+repr(cy_val)+' Area: '+repr(area_val)+' Nobj: '+repr(num_objects_val)
 					if(num_objects_val>0):					# If we've seen something, adjust our pointing
-						img_balloon_ber = (cx_val-cx_mid)*cx_fov*0.5    # Basic camera model, somebody check this
+						img_balloon_ber = (cx_val-cx_mid)*cx_fov/640    # Basic camera model, somebody check this
 						if(abs(img_balloon_ber)<yaw_bound_err):		# If we're in the error, advance and update bear est.							
 							sequence=3
 							max_bear_val = yaw_pos+img_balloon_ber
@@ -252,14 +255,15 @@ while(1):
 				#error_x_y = controller.rc_xy(x_com, y_com)
 				err_x = 0#error_x_y[0]
 				err_y = 0#error_x_y[1]
-				print('Seq: '+repr(sequence)+' Err Z: '+repr(round(error_z))+' Err Yaw: '+repr(round(error_yaw))+' Err X: '+repr(round(err_x))+' Err y: '+repr(round(err_y)))
+				#print('Seq: '+repr(sequence)+' Err Z: '+repr(round(error_z))+' Err Yaw: '+repr(round(error_yaw))+' Err X: '+repr(round(err_x))+' Err y: '+repr(round(err_y)))
 				if ((abs(error_z) < pos_bound_err) and (abs(error_yaw) < yaw_bound_err) and (abs(err_y) < pos_bound_err) and (abs(err_x) < pos_bound_err)):# Closes Error 
 					# Check to see if we still see the Balloon					
 					yaw_pos = 0#vidro.get_yaw_radians() # Update our radians					
 					get_camera_frame()
 					cx_val,cy_val,area_val,num_objecst_val = get_object(frame)
+					print 'Yaw: ',repr(yaw_com),' Xcom: '+repr(x_com)+' YCom: '+repr(y_com)+' Area: '+repr(area_val)+' Bear: '+repr(round(max_bear_val*180/math.pi))
 					if(num_objects_val>0):					# If we've seen something, adjust our pointing
-						img_balloon_ber = (cx_val-cx_mid)*cx_fov*0.5    # Basic camera model, somebody check this
+						img_balloon_ber = (cx_val-cx_mid)*cx_fov/640    # Basic camera model, somebody check this
 						max_bear_val = yaw_pos+img_balloon_ber
 						if(max_bear_val<0):
 							max_bear_val+=(2*math.pi) 		# Keep it positive
