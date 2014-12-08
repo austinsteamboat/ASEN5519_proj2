@@ -70,9 +70,11 @@ while(1):
 			vidro.update_mavlink() # Grab updated rc channel values
 			#On ground -> Takeoff to 1 m
 			if sequence == 0:
-				error_z = controller.rc_alt(1000)
-				error_yaw = controller.rc_yaw(0)
+				#error_z = controller.rc_alt(1000)
+				#error_yaw = controller.rc_yaw(0)
 				#error_x_y = controller.rc_xy(0, 0)
+				error_z = 0
+				error_yaw = 0
 				err_x = 0#error_x_y[0]
 				err_y = 0#error_x_y[1]
 				print('Seq: '+repr(sequence)+' Err Z: '+repr(error_z)+' Err Yaw: '+repr(error_yaw)+' Err X: '+repr(err_x)+' Err y: '+repr(err_y))
@@ -80,13 +82,21 @@ while(1):
 					seq0_cnt += 1 # just update the sequence if the loop is closed for 3 software loops
 					print('update')
 					if seq0_cnt == 10:
-						sequence = 2
+						sequence = 1
+						time1 = time.time()
 
 			#Turn in center of space
 			if sequence == 1:
-				error_z = controller.rc_alt(1000)
-				error_yaw = controller.rc_yaw(yaw)
+				# Hold her steady while we img proc					
+				vidro.set_rc_throttle(vidro.base_rc_throttle)
+				vidro.set_rc_roll(vidro.base_rc_roll)
+				vidro.set_rc_pitch(vidro.base_rc_pitch)
+				vidro.set_rc_yaw(vidro.base_rc_yaw)
+				#error_z = controller.rc_alt(1000)
+				#error_yaw = controller.rc_yaw(yaw)
 				#error_x_y = controller.rc_xy(0,0)
+				error_z = 0
+				error_yaw = 0
 				err_x = 0#error_x_y[0]
 				err_y = 0#error_x_y[1]
 				print('Seq: '+repr(sequence)+' Err Z: '+repr(error_z)+' Err Yaw: '+repr(error_yaw)+' Err X: '+repr(err_x)+' Err y: '+repr(err_y))
@@ -96,8 +106,10 @@ while(1):
 					print('update')
 					if yaw > 2 * math.pi:
 						yaw -= (2 * math.pi)					
-					if seq1_cnt==20: # once we've closed the loop for 20 steps, we're done
+					if seq1_cnt==5: # once we've closed the loop for 20 steps, we're done
 						sequence = 2
+						time2 = time.time()
+						print 'Duration: '+repr(time2-time1)
 						
 			#Move to landing position
 			if sequence == 2:
@@ -111,7 +123,7 @@ while(1):
 					print('update')
 					seq2_cnt += 1
 					#if seq2_cnt==3: # once we've closed the loop 5 times, advance!
-					desc_alt-=1
+					desc_alt-=10
 					if(desc_alt<170):
 						sequence = 3
 
