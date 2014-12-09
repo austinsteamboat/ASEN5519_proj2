@@ -255,8 +255,8 @@ class PositionController:
         waypoint_angle = math.degrees(math.atan2(self.error_y,self.error_x))
 
         #Calculate the offset of the vehicle from the x-y (lat-lon) axis
-        vehicle_angle = 90 - (waypoint_angle + heading)
-
+        vehicle_angle = (waypoint_angle - heading)
+        print("Vehicle Angle:" + repr(vehicle_angle))
         #Calculate the error for the roll and pitch
         self.error_roll = total_error * math.sin(math.radians(vehicle_angle))
         self.error_pitch = total_error * math.cos(math.radians(vehicle_angle))*-1
