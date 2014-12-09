@@ -31,6 +31,12 @@ yaw_bound_err = 0.2
 yaw_com = 0
 alt_com = 1000
 reset_val = 1
+# Idle Commands
+roll_idle = 0
+pitch_idle = 1
+throttle_idle = 2
+yaw_idle = 3
+
 print('Heading to while')
 while(1):
 ##        try:
@@ -87,6 +93,10 @@ while(1):
 					#print('update')
 					if seq0_cnt == 10:
 						sequence = 1
+						roll_idle = vidro.current_rc_channels[0]
+						pitch_idle = vidro.current_rc_channels[0]
+						throttle_idle = vidro.current_rc_channels[0]
+						yaw_idle = vidro.current_rc_channels[0]					
 
 			if sequence == 1:
 				error_z = controller.rc_alt(alt_com)
@@ -133,7 +143,7 @@ while(1):
 				controller.vidro.rc_yaw_reset()
 				controller.vidro.rc_pitch_reset()
 				controller.vidro.rc_roll_reset()
-				break
+				sequence = 3
 
 			if vidro.current_rc_channels[5] < 1600:
 				reset_val = 1
