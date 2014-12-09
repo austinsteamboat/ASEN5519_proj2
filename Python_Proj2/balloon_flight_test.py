@@ -83,8 +83,8 @@ while(1):
 				if ((abs(error_z) < pos_bound_err) and (abs(error_yaw) < yaw_bound_err) and (abs(err_y) < pos_bound_err) and (abs(err_x) < pos_bound_err)):# Closes Error for takeoff
 					seq0_cnt += 1 # just update the sequence if the loop is closed for 3 software loops
 					print('update')
-					if seq0_cnt == 10:
-						sequence = 0
+					if seq0_cnt == 20:
+						sequence = 2
 						time1 = time.time()
 
 			#Turn in center of space

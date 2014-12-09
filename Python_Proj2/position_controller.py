@@ -258,7 +258,7 @@ class PositionController:
         vehicle_angle = (waypoint_angle - heading)
         print("Vehicle Angle:" + repr(vehicle_angle))
         #Calculate the error for the roll and pitch
-        self.error_roll = total_error * math.sin(math.radians(vehicle_angle))
+        self.error_roll = total_error * math.sin(math.radians(vehicle_angle))*-1
         self.error_pitch = total_error * math.cos(math.radians(vehicle_angle))*-1
 
         #Calculate delta-t for integration

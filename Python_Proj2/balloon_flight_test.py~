@@ -61,7 +61,7 @@ while(1):
 		vidro.previous_error_roll = 0
 		vidro.previous_error_pitch = 0
 		desc_alt = 1000
-		print('outer loop')
+		print('outer loop'+' Roll: '+repr(vidro.current_rc_channels[0])+' Pitch: '+repr(vidro.current_rc_channels[1]))
 		#Update of gains before going into control loop
 		if vidro.current_rc_channels[5] > 1600:
 			controller.update_gains()
@@ -72,15 +72,19 @@ while(1):
 			if sequence == 0:
 				error_z = controller.rc_alt(1000)
 				error_yaw = controller.rc_yaw(0)
-				#error_x_y = controller.rc_xy(0, 0)
-				err_x = 0#error_x_y[0]
-				err_y = 0#error_x_y[1]
-				print('Seq: '+repr(sequence)+' Err Z: '+repr(error_z)+' Err Yaw: '+repr(error_yaw)+' Err X: '+repr(err_x)+' Err y: '+repr(err_y))
+				error_x_y = controller.rc_xy(0, 0)
+				#error_z = 0
+				#error_yaw = 0
+				err_x = error_x_y[0]
+				err_y = error_x_y[1]
+				#controller.vidro.set_rc_pitch(1450)
+				#controller.vidro.set_rc_roll(1370)
+				print('Seq: '+repr(sequence)+' Err Z: '+repr(error_z)+' Err Yaw: '+repr(error_yaw)+' Err X: '+repr(err_x)+' Err y: '+repr(err_y)+' Roll: '+repr(vidro.current_rc_channels[0])+' Pitch: '+repr(vidro.current_rc_channels[1]))
 				if ((abs(error_z) < pos_bound_err) and (abs(error_yaw) < yaw_bound_err) and (abs(err_y) < pos_bound_err) and (abs(err_x) < pos_bound_err)):# Closes Error for takeoff
 					seq0_cnt += 1 # just update the sequence if the loop is closed for 3 software loops
 					print('update')
 					if seq0_cnt == 10:
-						sequence = 1
+						sequence = 0
 						time1 = time.time()
 
 			#Turn in center of space
@@ -104,7 +108,7 @@ while(1):
 					print('update')
 					if yaw > 2 * math.pi:
 						yaw -= (2 * math.pi)					
-					if seq1_cnt==20: # once we've closed the loop for 20 steps, we're done
+					if seq1_cnt==5: # once we've closed the loop for 20 steps, we're done
 						sequence = 2
 						time2 = time.time()
 						print 'Duration: '+repr(time2-time1)
@@ -113,9 +117,9 @@ while(1):
 			if sequence == 2:
 				error_z = controller.rc_alt(desc_alt)
 				error_yaw = controller.rc_yaw(0)
-				#error_x_y = controller.rc_xy(0, 0)
-				err_x = 0#error_x_y[0]
-				err_y = 0#error_x_y[1]
+				error_x_y = controller.rc_xy(0, 0)
+				err_x = error_x_y[0]
+				err_y = error_x_y[1]
 				print('Seq: '+repr(sequence)+' Err Z: '+repr(error_z)+' Err Yaw: '+repr(error_yaw)+' Err X: '+repr(err_x)+' Err y: '+repr(err_y))
 				if ((abs(error_z) < pos_bound_err) and (abs(error_yaw) < yaw_bound_err) and (abs(err_y) < pos_bound_err) and (abs(err_x) < pos_bound_err)):# Closes Error for takeoff
 					print('update')
