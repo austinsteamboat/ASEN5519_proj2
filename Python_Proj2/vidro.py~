@@ -320,41 +320,39 @@ class Vidro:
 		-'HEARTBEAT'
 		This is non-blocking so does not gaurantee to chnage any values.
 		"""
-		self.msg = self.master.recv_match(blocking=False)
+		self.msg = self.master.recv_match(type='RC_CHANNELS_RAW',blocking=False)
 
 		if self.msg:
 			#print self.msg.get_type()
+			try:
+				self.current_rc_channels[0] = self.msg.chan1_raw
+				self.current_rc_channels[1] = self.msg.chan2_raw
+				self.current_rc_channels[2] = self.msg.chan3_raw
+				self.current_rc_channels[3] = self.msg.chan4_raw
+				self.current_rc_channels[4] = self.msg.chan5_raw
+				self.current_rc_channels[5] = self.msg.chan6_raw
+			except:
+				pass
+			
+			if self.vicon_time >= self.get_vicon()[0]:
+				logging.error('Vicon system values are remainng the same. Stop the system and restart the vicon values')
+				self.set_rc_throttle(self.base_rc_throttle)
+				self.set_rc_roll(self.base_rc_roll)
+				self.set_rc_pitch(self.base_rc_pitch)
+				self.set_rc_yaw(self.base_rc_yaw)
+				self.vicon_error = True
+			self.vicon_time = self.get_vicon()[0]
 
-			if self.msg.get_type() == "RC_CHANNELS_RAW":
-				try:
-					self.current_rc_channels[0] = self.msg.chan1_raw
-					self.current_rc_channels[1] = self.msg.chan2_raw
-					self.current_rc_channels[2] = self.msg.chan3_raw
-					self.current_rc_channels[3] = self.msg.chan4_raw
-					self.current_rc_channels[4] = self.msg.chan5_raw
-					self.current_rc_channels[5] = self.msg.chan6_raw
-				except:
-					pass
-				
-				if self.vicon_time >= self.get_vicon()[0]:
-					logging.error('Vicon system values are remainng the same. Stop the system and restart the vicon values')
-					self.set_rc_throttle(self.base_rc_throttle)
-					self.set_rc_roll(self.base_rc_roll)
-					self.set_rc_pitch(self.base_rc_pitch)
-					self.set_rc_yaw(self.base_rc_yaw)
-					self.vicon_error = True
-				self.vicon_time = self.get_vicon()[0]
+			self.send_rc_overrides()
 
-				self.send_rc_overrides()
+		if self.sitl == True:
+			if self.msg.get_type() == "ATTITUDE":
+				self.current_yaw = self.msg.yaw*180/math.pi
 
-			if self.sitl == True:
-				if self.msg.get_type() == "ATTITUDE":
-					self.current_yaw = self.msg.yaw*180/math.pi
-
-				if self.msg.get_type() == "GLOBAL_POSITION_INT":
-					self.current_lat = self.msg.lat * 1.0e-7
-					self.current_lon = self.msg.lon * 1.0e-7
-					self.current_alt = self.msg.alt-self.ground_alt
+			if self.msg.get_type() == "GLOBAL_POSITION_INT":
+				self.current_lat = self.msg.lat * 1.0e-7
+				self.current_lon = self.msg.lon * 1.0e-7
+				self.current_alt = self.msg.alt-self.ground_alt
 
 	def connect_vicon(self):
 		"""

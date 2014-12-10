@@ -592,9 +592,9 @@ class Vidro:
 		"""
 		try:
 			if self.num_vicon_objs == 1:
-				yaw = math.degrees((self.get_vicon()[6]*(1.0)) % ((2*math.pi)*(1.0)))*-1
+				yaw = math.degrees((self.get_vicon()[6]*(1.0)) % ((2*math.pi)*(1.0)))
 			if self.num_vicon_objs == 2:
-				yaw = math.degrees((self.get_vicon()[9]*(1.0)) % ((2*math.pi)*(1.0)))*-1
+				yaw = math.degrees((self.get_vicon()[9]*(1.0)) % ((2*math.pi)*(1.0)))
 			self.vicon_error = False
 			if yaw < 0.0:
 				yaw += 360

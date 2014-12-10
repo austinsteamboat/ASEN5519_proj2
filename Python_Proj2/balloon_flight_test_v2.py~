@@ -26,10 +26,10 @@ seq0_cnt = 0
 seq1_cnt = 0
 seq2_cnt = 0
 seq3_cnt = 0
-pos_bound_err = 150
+pos_bound_err = 300
 yaw_bound_err = 0.2
 yaw_com = 0
-alt_com = 1000
+alt_com = 1350
 reset_val = 1
 # Idle Commands
 roll_idle = 0
@@ -94,9 +94,9 @@ while(1):
 					if seq0_cnt == 10:
 						sequence = 1
 						roll_idle = vidro.current_rc_channels[0]
-						pitch_idle = vidro.current_rc_channels[0]
-						throttle_idle = vidro.current_rc_channels[0]
-						yaw_idle = vidro.current_rc_channels[0]					
+						pitch_idle = vidro.current_rc_channels[1]
+						throttle_idle = vidro.current_rc_channels[2]
+						yaw_idle = vidro.current_rc_channels[3]					
 
 			if sequence == 1:
 				error_z = controller.rc_alt(alt_com)
@@ -112,13 +112,18 @@ while(1):
 				if ((abs(error_z) < pos_bound_err) and (abs(error_yaw) < yaw_bound_err) and (abs(err_y) < pos_bound_err) and (abs(err_x) < pos_bound_err)):# Closes Error for takeoff
 					seq1_cnt += 1 # just update the sequence if the loop is closed for 3 software loops
 					print('update')
-					if seq1_cnt == 10:
+					if seq1_cnt == 5:
+						roll_idle = vidro.current_rc_channels[0]
+						pitch_idle = vidro.current_rc_channels[1]
+						throttle_idle = vidro.current_rc_channels[2]
+						yaw_idle = vidro.current_rc_channels[3]	
 						seq1_cnt = 0
 						yaw_com+=yaw_coarse_step
+						print "Yaw Com: "+repr(yaw_com)
 						if (yaw_com > 2 * math.pi): # Check if we've done a full circle
 							yaw_com-=(2*math.pi) # Keep it positive	
 							sequence = 2
-							yaw_com = 0			
+							#yaw_com = 0			
 						
 			#Move to landing position
 			if sequence == 2:

@@ -71,7 +71,7 @@ while(1):
 			#On ground -> Takeoff to 1 m
 			if sequence == 0:
 				error_z = controller.rc_alt(1000)
-				error_yaw = controller.rc_yaw(0)
+				error_yaw = controller.rc_yaw(1.57079633)#positive 90
 				error_x_y = controller.rc_xy(0, 0)
 				#error_z = 0
 				#error_yaw = 0
@@ -116,7 +116,7 @@ while(1):
 			#Move to landing position
 			if sequence == 2:
 				error_z = controller.rc_alt(desc_alt)
-				error_yaw = controller.rc_yaw(0)
+				error_yaw = controller.rc_yaw(1.57079633)
 				error_x_y = controller.rc_xy(0, 0)
 				err_x = error_x_y[0]
 				err_y = error_x_y[1]
