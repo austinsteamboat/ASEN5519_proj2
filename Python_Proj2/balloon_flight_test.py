@@ -143,7 +143,7 @@ while(1):
 		vidro.previous_error_roll = 0
 		vidro.previous_error_pitch = 0
 		desc_alt = 1000
-		print('outer loop'+' Roll: '+repr(vidro.current_rc_channels[0])+' Pitch: '+repr(vidro.current_rc_channels[1])+repr(logging_on))
+		print('outer loop'+' Roll: '+repr(vidro.current_rc_channels[0])+' Pitch: '+repr(vidro.current_rc_channels[1])+' Throttle: '+repr(vidro.current_rc_channels[2])+' Yaw: '+repr(vidro.current_rc_channels[3]))
 		alt_com = 0		
 		yaw_com = 0		
 		x_com = 0
@@ -166,7 +166,7 @@ while(1):
 			#pwm_logger(logging_on,pwm_log_data)
 			#pos_logger(logging_on,pos_log_data)
 			#err_logger(logging_on,err_log_data)
-			print(' X_err: '+repr(err_log_data[0])+' Y_err: '+repr(err_log_data[1])+' Z_err: '+repr(err_log_data[2])+' Roll_err: '+repr(err_log_data[3])+' Pitch_err: '+repr(err_log_data[4])+' Yaw_err: '+repr(err_log_data[5]))
+			print(' Yaw Pos: '+repr(pos_log_data[3])+' Yaw_err: '+repr(err_log_data[5])+' Yaw_pwm: '+repr(pwm_log_data[3]))
 
 			#On ground -> Takeoff to 1 m
 			if sequence == 0:
