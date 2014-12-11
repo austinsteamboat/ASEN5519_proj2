@@ -174,8 +174,7 @@ class PositionController:
             self.error_yaw = target_heading - (yaw+2*math.pi)
         if abs(target_heading - (yaw-2*math.pi)) < abs(self.error_yaw):
             self.error_yaw = target_heading - (yaw-2*math.pi)
-        self.error_yaw = self.error_yaw * -1
-
+        self.error_yaw = self.error_yaw 
         #Get error I
         self.I_error_yaw = self.I_error_yaw + self.error_yaw*delta_t
 
@@ -256,7 +255,7 @@ class PositionController:
 
         #Calculate the offset of the vehicle from the x-y (lat-lon) axis
         vehicle_angle = (waypoint_angle - heading)
-        print("Vehicle Angle:" + repr(vehicle_angle))
+        #print("Vehicle Angle:" + repr(vehicle_angle))
         #Calculate the error for the roll and pitch
         self.error_roll = total_error * math.sin(math.radians(vehicle_angle))*-1
         self.error_pitch = total_error * math.cos(math.radians(vehicle_angle))*-1

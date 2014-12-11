@@ -12,12 +12,13 @@ import numpy as np
 import cv2
 
 cap = cv2.VideoCapture(1)
+time_prev = time.time()
+time_new = 0
+H_lower = 20 #157
+S_lower = 114 #149
+V_lower = 121 #67
 
-H_lower = 0 #157
-S_lower = 149 #149
-V_lower = 67 #67
-
-H_upper = 14 # 186
+H_upper = 182 # 186
 S_upper = 255 # 255
 V_upper = 255 # 255
 
@@ -67,9 +68,12 @@ def get_camera_frame():
 	new_frame = True
 
 while(1):
+	time_prev = time_new
+	time_new = time.time()
+	print('Diff Time: '+repr(time_new-time_prev))
 	get_camera_frame()
 	get_object(frame)
-	cv2.imshow('frame',frame)
+	#cv2.imshow('frame',frame)
 	k = cv2.waitKey(5) & 0xFF
 	if k == 27:
 		break

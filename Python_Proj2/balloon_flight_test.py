@@ -79,12 +79,12 @@ while(1):
 				err_y = error_x_y[1]
 				#controller.vidro.set_rc_pitch(1450)
 				#controller.vidro.set_rc_roll(1370)
-				print('Seq: '+repr(sequence)+' Err Z: '+repr(error_z)+' Err Yaw: '+repr(error_yaw)+' Err X: '+repr(err_x)+' Err y: '+repr(err_y)+' Roll: '+repr(vidro.current_rc_channels[0])+' Pitch: '+repr(vidro.current_rc_channels[1]))
+				print(' Err Z: '+repr(error_z)+' Err Yaw: '+repr(error_yaw)+'Mes yaw: '+repr(vidro.get_yaw_radians())+' Err Pitch: '+repr(err_x)+' Err Roll: '+repr(err_y)+' Roll: '+repr(vidro.current_rc_channels[0])+' Pitch: '+repr(vidro.current_rc_channels[1]))
 				if ((abs(error_z) < pos_bound_err) and (abs(error_yaw) < yaw_bound_err) and (abs(err_y) < pos_bound_err) and (abs(err_x) < pos_bound_err)):# Closes Error for takeoff
 					seq0_cnt += 1 # just update the sequence if the loop is closed for 3 software loops
-					print('update')
+					#print('update')
 					if seq0_cnt == 20:
-						sequence = 2
+						sequence = 0
 						time1 = time.time()
 
 			#Turn in center of space
