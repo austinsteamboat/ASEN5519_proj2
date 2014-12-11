@@ -65,7 +65,7 @@ def logger(log_true,sequence,pwm_data,pos_data,error_data):
 	if log_true:
 		msg_type = ' SEQ '
 		log_time = time.time()-start_time
-		logging.info(repr(log_time)+','+repr(sequence)+','+repr(pwm_data[0])+','+repr(pwm_data[1])+','+repr(pwm_data[2])+','repr(pwm_data[3])+','+repr(pos_data[0])+','+repr(pos_data[1])+','+repr(pos_data[2])+','+repr(pos_data[3])+','+repr(error_data[0])+','+repr(error_data[1])+','+repr(error_data[2]+','+repr(error_data[3])+','+repr(error_data[4])+','+repr(error_data[5]))
+		logging.info(repr(log_time)+','+repr(sequence)+','+repr(pwm_data[0])+','+repr(pwm_data[1])+','+repr(pwm_data[2])+','+repr(pwm_data[3])+','+repr(pos_data[0])+','+repr(pos_data[1])+','+repr(pos_data[2])+','+repr(pos_data[3])+','+repr(error_data[0])+','+repr(error_data[1])+','+repr(error_data[2])+','+repr(error_data[3])+','+repr(error_data[4])+','+repr(error_data[5]))
 
 def sequence_logger(log_true,sequence):
 	if log_true:
@@ -152,7 +152,8 @@ while(1):
 			pwm_log_data = get_pwm()
 			pos_log_data = get_pos()
 			# Log data
-                        logger(loggin_on,pwm_log_data,pos_log_data,err_log_data)
+# log_true,sequence,pwm_data,pos_data,error_data
+                        logger(logging_on,sequence,pwm_log_data,pos_log_data,err_log_data)
 			#pwm_logger(logging_on,pwm_log_data)
 			#pos_logger(logging_on,pos_log_data)
 			#err_logger(logging_on,err_log_data)
@@ -164,7 +165,7 @@ while(1):
 				yaw_com = 0
 				x_com = 0
 				y_com = 0
-				sequence_logger(logging_on,sequence)
+				#sequence_logger(logging_on,sequence)
 				check_val = err_check(err_log_data,pos_bound_err,yaw_bound_err)
 				if (check_val):# Closes Error for takeoff
 					seq0_cnt += 1 # just update the sequence if the loop is closed for 3 software loops
