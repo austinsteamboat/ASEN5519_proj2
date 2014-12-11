@@ -22,7 +22,15 @@ S_upper = 255 # 255
 V_upper = 255 # 255
 
 #Start of a log
-logging.basicConfig(filename='btd.log', level=logging.DEBUG)
+logging.basicConfig(filename='btd.log', level=logging.INFO)
+
+logging_on = True
+
+def img_logger(log_true):
+	if log_true:
+		msg_type = ' IMG '
+		log_time = time.time()-start_time
+		logging.info(' Msg_Type: '+msg_type+' Time: '+repr(log_time)' Cx: '+repr(cx)+' Cy: '+repr(cy)+' Num Objs: '+repr(num_objects)+' Area: '+repr(area_max))
 
 def get_object(frame):
 	hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)

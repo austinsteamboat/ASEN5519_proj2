@@ -21,6 +21,12 @@ cycle = 0
 
 controller.update_gains()
 
+def pwm_logger(log_true):
+
+def vicon_pos_logger(log_true):
+
+def vicon_err_logger(log_true):
+
 sequence = 0
 seq0_cnt = 0
 seq1_cnt = 0
@@ -36,6 +42,7 @@ roll_idle = 0
 pitch_idle = 1
 throttle_idle = 2
 yaw_idle = 3
+logging_on = True
 
 print('Heading to while')
 while(1):

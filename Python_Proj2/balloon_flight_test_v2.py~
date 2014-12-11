@@ -112,7 +112,7 @@ while(1):
 				if ((abs(error_z) < pos_bound_err) and (abs(error_yaw) < yaw_bound_err) and (abs(err_y) < pos_bound_err) and (abs(err_x) < pos_bound_err)):# Closes Error for takeoff
 					seq1_cnt += 1 # just update the sequence if the loop is closed for 3 software loops
 					print('update')
-					if seq1_cnt == 5:
+					if seq1_cnt == 3:
 						roll_idle = vidro.current_rc_channels[0]
 						pitch_idle = vidro.current_rc_channels[1]
 						throttle_idle = vidro.current_rc_channels[2]

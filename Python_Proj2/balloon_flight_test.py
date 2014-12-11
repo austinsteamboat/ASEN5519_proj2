@@ -9,14 +9,12 @@ import numpy as np
 import cv2
 import logging
 
-
 #Setup of vidro and controller
 vidro = Vidro(False, 1)
 flight_ready = vidro.connect()
 controller = PositionController(vidro)
 
 start_time = time.time()
-previous_time = time.time()
 
 cycle = 0
 
@@ -29,11 +27,31 @@ seq2_cnt = 0
 seq3_cnt = 0
 pos_bound_err = 100
 yaw_bound_err = 0.2
+logging_on = True
 yaw = 0
 reset_val = 1
 time_begin = time.time()
 #Start of a log
-logging.basicConfig(filename='bft.log', level=logging.DEBUG)
+logging.basicConfig(filename='bft_log.log', level=logging.INFO)
+
+
+def pwm_logger(log_true):
+	if log_true:
+		msg_type = ' PWM '
+		log_time = time.time()-start_time
+		logging.info(' Msg_Type: '+msg_type+' Time: '+repr(log_time)+' Roll: '+repr(vidro.current_rc_channels[0])+' Pitch: '+repr(vidro.current_rc_channels[1])+' Throttle: '+repr(vidro.current_rc_channels[2])+' Yaw: '+repr(vidro.current_rc_channels[3]))
+
+def vicon_pos_logger(log_true):
+	if log_true:
+		msg_type = ' POS '
+		log_time = time.time()-start_time
+		logging.info(' Msg_Type: '+msg_type+' Time: '+repr(log_time)+' Roll: '+repr(vidro.current_rc_channels[0])+' Pitch: '+repr(vidro.current_rc_channels[1])+' Throttle: '+repr(vidro.current_rc_channels[2])+' Yaw: '+repr(vidro.current_rc_channels[3]))
+
+def vicon_err_logger(log_true):
+	if log_true:
+		msg_type = ' Err '
+		log_time = time.time()-start_time
+		logging.info(' Msg_Type: '+msg_type+' Time: '+repr(log_time)+' Roll: '+repr(vidro.current_rc_channels[0])+' Pitch: '+repr(vidro.current_rc_channels[1])+' Throttle: '+repr(vidro.current_rc_channels[2])+' Yaw: '+repr(vidro.current_rc_channels[3]))
 
 print('Heading to while')
 while(1):
