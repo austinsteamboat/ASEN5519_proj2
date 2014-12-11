@@ -13,7 +13,8 @@ import logging
 vidro = Vidro(False, 1)
 flight_ready = vidro.connect()
 controller = PositionController(vidro)
-
+# Start Time for Logging
+global start_time
 start_time = time.time()
 
 cycle = 0
@@ -27,11 +28,64 @@ seq2_cnt = 0
 seq3_cnt = 0
 pos_bound_err = 100
 yaw_bound_err = 0.2
+logging_on = True
 yaw = 0
 reset_val = 1
 time_begin = time.time()
 #Start of a log
 logging.basicConfig(filename='bft_log.log', level=logging.INFO)
+
+def get_pos:
+	x_pos = controller.vidro.get_position()[0]
+	y_pos = controller.vidro.get_position()[1]
+	z_pos = controller.vidro.get_position()[2]
+	yaw_pos = vidro.get_yaw_radians()
+	pos_data = [x_pos,y_pos,z_pos,yaw_pos]
+	return pos_data
+
+def get_pwm:
+	roll_pwm = vidro.current_rc_channels[0]
+	pitch_pwm = vidro.current_rc_channels[1]
+	throttle_pwm = vidro.current_rc_channels[2]
+	yaw_pwm = vidro.current_rc_channels[3]
+	pwm_data = [roll_pwm,pitch_pwm,throttle_pwm,yaw_pwm]
+	return pwm_data
+
+def get_err(x_com,y_com,z_com,yaw_com):
+	error_z = controller.rc_alt(z_com)
+	error_yaw = controller.rc_yaw(yaw_com)
+	error_x_y = controller.rc_xy(x_com, y_com)
+	error_data = [error_x_y[2],error_x_y[3],error_z,error_x_y[0],error_x_y[1],error_yaw]
+	return error_data
+
+def pwm_logger(log_true,pwm_data):
+	if log_true:
+		msg_type = ' PWM '
+		log_time = time.time()-start_time
+		logging.info(' Msg_Type: '+msg_type+' Time: '+repr(log_time)+' Roll: '+repr(pwm_data[0])+' Pitch: '+repr(pwm_data[1])+' Throttle: '+repr(pwm_data[2])+' Yaw: '+repr(pwm_data[3]))
+
+def pos_logger(log_true,pos_data):
+	if log_true:
+		msg_type = ' POS '
+		log_time = time.time()-start_time
+		logging.info(' Msg_Type: '+msg_type+' Time: '+repr(log_time)+' X: '+repr(pos_data[0])+' Y: '+repr(pos_data[1])+' Z: '+repr(pos_data[2])+' Yaw: '+repr(pos_data[3]))
+
+def err_logger(log_true,error_data):
+	if log_true:
+		msg_type = ' Err '
+		log_time = time.time()-start_time
+		logging.info(' Msg_Type: '+msg_type+' Time: '+repr(log_time)+' X_err: '+repr(error_data[0])+' Y_err: '+repr(error_data[1])+' Z_err: '+repr(error_data[2])+' Roll_err: '+repr(error_data[3])+' Pitch_err: '+repr(error_data[4])+' Yaw_err: '+repr(error_data[5]))
+
+def err_check(error_data,pos_bound_err,error_yaw):
+	error_x = error_data[0]
+	error_y = error_data[1]
+	error_z = error_data[2]
+	error_yaw = error_data[5]
+	if ((abs(error_z) < pos_bound_err) and (abs(error_yaw) < yaw_bound_err) and (abs(err_y) < pos_bound_err) and (abs(err_x) < pos_bound_err)):
+		x_out = True
+	else:
+		x_out = False
+	return x_out
 
 print('Heading to while')
 while(1):
@@ -65,30 +119,40 @@ while(1):
 		vidro.previous_error_pitch = 0
 		desc_alt = 1000
 		print('outer loop'+' Roll: '+repr(vidro.current_rc_channels[0])+' Pitch: '+repr(vidro.current_rc_channels[1]))
+		alt_com = 0		
+		yaw_com = 0		
+		x_com = 0
+		y_com = 0
 		#Update of gains before going into control loop
 		if vidro.current_rc_channels[5] > 1600:
 			controller.update_gains()
 
 		while vidro.current_rc_channels[5] > 1600:
-			vidro.update_mavlink() # Grab updated rc channel values
+			# Update Commands
+			err_log_data = get_err(x_com,y_com,alt_com,yaw_com)
+			# Grab updated rc channel values
+			vidro.update_mavlink()
+			# Get PWM commands and Pos
+			pwm_log_data = get_pwm()
+			pos_log_data = get_pos()
+			# Log data
+			pwm_logger(logging_on,pwm_log_data)
+			pos_logger(logging_on,pos_log_data)
+			err_logger(logging_on,err_log_data)
+			print(' X_err: '+repr(error_data[0])+' Y_err: '+repr(error_data[1])+' Z_err: '+repr(error_data[2])+' Roll_err: '+repr(error_data[3])+' Pitch_err: '+repr(error_data[4])+' Yaw_err: '+repr(error_data[5]))
+
 			#On ground -> Takeoff to 1 m
 			if sequence == 0:
-				error_z = controller.rc_alt(1000)
-				error_yaw = controller.rc_yaw(1.57079633)#positive 90
-				error_x_y = controller.rc_xy(0, 0)
-				#error_z = 0
-				#error_yaw = 0
-				err_x = error_x_y[0]
-				err_y = error_x_y[1]
-				#controller.vidro.set_rc_pitch(1450)
-				#controller.vidro.set_rc_roll(1370)
-				print(' Err Z: '+repr(error_z)+' Err Yaw: '+repr(error_yaw)+' Err Pitch: '+repr(err_x)+' Err Roll: '+repr(err_y)+' Roll: '+repr(vidro.current_rc_channels[0])+' Pitch: '+repr(vidro.current_rc_channels[1]))
-				if ((abs(error_z) < pos_bound_err) and (abs(error_yaw) < yaw_bound_err) and (abs(err_y) < pos_bound_err) and (abs(err_x) < pos_bound_err)):# Closes Error for takeoff
+				alt_com = 1000
+				yaw_com = 1.57079633
+				x_com = 0
+				y_com = 0
+				check_val = err_check(error_data,pos_bound_err,error_yaw)
+				if (check_val):# Closes Error for takeoff
 					seq0_cnt += 1 # just update the sequence if the loop is closed for 3 software loops
 					#print('update')
-					if seq0_cnt == 20:
+					if seq0_cnt == 10:
 						sequence = 0
-						time1 = time.time()
 
 			#Turn in center of space
 			if sequence == 1:
@@ -135,6 +199,7 @@ while(1):
 			# Land
 			if sequence == 3: 
 				controller.vidro.set_rc_throttle(0)# it'll round it to minimum which is like 1100
+				logging_on = False
 				#print(' RC 1 '+repr(vidro.current_rc_channels[0])+' RC 2 '+repr(vidro.current_rc_channels[1])+' RC 3 '+repr(vidro.current_rc_channels[2])+' RC 4 '+repr(vidro.current_rc_channels[3])+' RC 5 '+repr(vidro.current_rc_channels[4])+' RC 6 '+repr(vidro.current_rc_channels[5]))
 				sequence = 3
 

@@ -303,7 +303,7 @@ class PositionController:
         self.vidro.set_rc_pitch( self.vidro.base_rc_pitch + (self.error_pitch*self.pitch_K_P) + (self.I_error_pitch*self.pitch_K_I) + (self.D_error_pitch*self.pitch_K_D) )
         self.vidro.set_rc_roll(  self.vidro.base_rc_roll + (self.error_roll*self.roll_K_P) + (self.I_error_roll*self.roll_K_I) + (self.D_error_roll*self.roll_K_D) )
 
-        return self.error_pitch, self.error_roll
+        return self.error_pitch, self.error_roll, self.error_x, self.error_y
 
     def filter_value(self, high, low, value):
         if high < low:
