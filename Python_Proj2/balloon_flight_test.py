@@ -61,6 +61,12 @@ def get_err(x_com,y_com,z_com,yaw_com):
 	error_data = [error_x_y[2],error_x_y[3],error_z,error_x_y[0],error_x_y[1],error_yaw]
 	return error_data
 
+def logger(log_true,sequence,pwm_data,pos_data,error_data):
+	if log_true:
+		msg_type = ' SEQ '
+		log_time = time.time()-start_time
+		logging.info(repr(log_time)+','+repr(sequence)+','+repr(pwm_data[0])+','+repr(pwm_data[1])+','+repr(pwm_data[2])+','repr(pwm_data[3])+','+repr(pos_data[0])+','+repr(pos_data[1])+','+repr(pos_data[2])+','+repr(pos_data[3])+','+repr(error_data[0])+','+repr(error_data[1])+','+repr(error_data[2]+','+repr(error_data[3])+','+repr(error_data[4])+','+repr(error_data[5]))
+
 def sequence_logger(log_true,sequence):
 	if log_true:
 		msg_type = ' SEQ '
@@ -146,9 +152,10 @@ while(1):
 			pwm_log_data = get_pwm()
 			pos_log_data = get_pos()
 			# Log data
-			pwm_logger(logging_on,pwm_log_data)
-			pos_logger(logging_on,pos_log_data)
-			err_logger(logging_on,err_log_data)
+                        logger(loggin_on,pwm_log_data,pos_log_data,err_log_data)
+			#pwm_logger(logging_on,pwm_log_data)
+			#pos_logger(logging_on,pos_log_data)
+			#err_logger(logging_on,err_log_data)
 			print(' X_err: '+repr(err_log_data[0])+' Y_err: '+repr(err_log_data[1])+' Z_err: '+repr(err_log_data[2])+' Roll_err: '+repr(err_log_data[3])+' Pitch_err: '+repr(err_log_data[4])+' Yaw_err: '+repr(err_log_data[5]))
 
 			#On ground -> Takeoff to 1 m
