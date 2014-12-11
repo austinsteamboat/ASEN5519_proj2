@@ -91,7 +91,7 @@ def err_check(error_data,pos_bound_err,yaw_bound_err):
 	error_y = error_data[1]
 	error_z = error_data[2]
 	error_yaw = error_data[5]
-	if ((abs(error_z) < pos_bound_err) and (abs(error_yaw) < yaw_bound_err) and (abs(err_y) < pos_bound_err) and (abs(err_x) < pos_bound_err)):
+	if ((abs(error_z) < pos_bound_err) and (abs(error_yaw) < yaw_bound_err) and (abs(error_y) < pos_bound_err) and (abs(error_x) < pos_bound_err)):
 		x_out = True
 	else:
 		x_out = False

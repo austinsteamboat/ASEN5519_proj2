@@ -157,6 +157,7 @@ while(1):
 				yaw_com = 0
 				x_com = 0
 				y_com = 0
+				sequence_logger(logging_on,sequence)
 				check_val = err_check(err_log_data,pos_bound_err,yaw_bound_err)
 				if (check_val):# Closes Error for takeoff
 					seq0_cnt += 1 # just update the sequence if the loop is closed for 3 software loops
