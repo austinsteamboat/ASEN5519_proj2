@@ -14,16 +14,16 @@ import logging
 logging.basicConfig(filename='bft_log.log', level=logging.INFO)
 logging.info('Starting')
 #Setup of vidro and controller
-vidro = Vidro(False, 1)
-flight_ready = vidro.connect()
-controller = PositionController(vidro)
+#vidro = Vidro(False, 1)
+#flight_ready = vidro.connect()
+#controller = PositionController(vidro)
 # Start Time for Logging
 global start_time
 start_time = time.time()
 
 cycle = 0
 
-controller.update_gains()
+#controller.update_gains()
 
 sequence = 0
 seq0_cnt = 0
@@ -176,62 +176,40 @@ def err_check(error_data,pos_bound_err,yaw_bound_err):
 	return x_out
 
 print('Heading to while')
+alt_com = 0		
+yaw_com = 0		
+x_com = 0
+y_com = 0
+balloon_found = False
+area_max_val = 0
 while(1):
 ##        try:
 ##                print('RC 5 '+repr(self.msg.chan5_raw)+' RC 6 '+repr(self.msg.chan6_raw))
 ##        except:
 ##                print('RC 5 Vidro Update '+repr(vidro.current_rc_channels[4])+' RC 6 Vidro Update '+repr(vidro.current_rc_channels[5]))
-	vidro.update_mavlink() # Grab updated rc channel values. This is the right command for it, but it doesn't always seem to update RC channels
-	while vidro.current_rc_channels[4] > 1600 and flight_ready == True:
+	#vidro.update_mavlink() # Grab updated rc channel values. This is the right command for it, but it doesn't always seem to update RC channels
+	while True:
 		if(reset_val):
 			print 'RESET!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-			controller.vidro.rc_throttle_reset()
-			controller.vidro.rc_yaw_reset()
-			controller.vidro.rc_pitch_reset()
-			controller.vidro.rc_roll_reset()
 			reset_val = 0
-			
-		#print('RC 5 '+repr(vidro.current_rc_channels[4])+' RC 6 '+repr(vidro.current_rc_channels[5]))
-		vidro.update_mavlink() # Grab updated rc channel values. This is the right command for it, but it doesn't always seem to update RC channels
-		#Reset of errors after each time control loop finishes
-		controller.I_error_alt = 0
-		controller.I_error_pitch = 0
-		controller.I_error_roll = 0
-		controller.I_error_yaw = 0
-		controller.previous_time_alt = (time.time() - controller.timer) * 10
-		controller.previous_time_yaw = (time.time() - controller.timer) * 10
-		controller.previous_time_xy = (time.time() - controller.timer) * 10
-		vidro.previous_error_alt = 0
-		vidro.previous_error_yaw = 0
-		vidro.previous_error_roll = 0
-		vidro.previous_error_pitch = 0
-		desc_alt = 1000
-		print('outer loop'+' Roll: '+repr(vidro.current_rc_channels[0])+' Pitch: '+repr(vidro.current_rc_channels[1])+' Throttle: '+repr(vidro.current_rc_channels[2])+' Yaw: '+repr(vidro.current_rc_channels[3]))
-		alt_com = 0		
-		yaw_com = 0		
-		x_com = 0
-		y_com = 0
-		balloon_found = False
-		area_max_val = 0
 		cx_mid = 640/2 # Given the camera resolution
 		cy_mid = 480/2 # Given the camera resoltuion
 		guid_adv = 300	
 		balloon_area_max_thresh = 150000 # Size for estimating we're at the balloon
 		cx_fov = 1.15192 # Camera azimuth field of view in radians(66 degrees)
 		#Update of gains before going into control loop
-		if vidro.current_rc_channels[5] > 1600:
-			controller.update_gains()
-
-		while vidro.current_rc_channels[5] > 1600:
+		while True:
 			# Update Commands
-			err_log_data = get_err(x_com,y_com,alt_com,yaw_com)
+			#err_log_data = get_err(x_com,y_com,alt_com,yaw_com)
+			err_log_data = [0,0,0,0,0,0]
 			# Grab updated rc channel values
-			vidro.update_mavlink()
+			#vidro.update_mavlink()
 			# Get PWM commands and Pos
-			pwm_log_data = get_pwm()
-			pos_log_data = get_pos()
+			#pwm_log_data = get_pwm()
+			#pos_log_data = get_pos()
+			pos_log_data = [0,0,0,0]
 			# Log data
-                        logger(logging_on,sequence,pwm_log_data,pos_log_data,err_log_data)
+                        #logger(logging_on,sequence,pwm_log_data,pos_log_data,err_log_data)
 			#pwm_logger(logging_on,pwm_log_data)
 			#pos_logger(logging_on,pos_log_data)
 			#err_logger(logging_on,err_log_data)
@@ -252,6 +230,8 @@ while(1):
 			# Coarse Search
 			if sequence == 1:
 				alt_com = 1000
+				print(' Yaw Com: '+repr(yaw_com))
+				print(' Balloon Found: '+repr(balloon_found))
 				#sequence_logger(logging_on,sequence)
 				check_val = err_check(err_log_data,pos_bound_err,yaw_bound_err)
 				if (check_val):# Closes Error 			
@@ -259,21 +239,24 @@ while(1):
 					if seq1_cnt == 5:
 						seq1_cnt = 0
 						yaw_com +=0.4						
-						if (yaw_com > (2 * math.pi)):########################################################
+						if (yaw_com > (5.8)):########################################################
 							if(balloon_found):							
-								sequence = 2						
+								sequence = 2
+								print('What')						
 								yaw_com = max_bear_val
 							else:	
 								yaw_com -= (2 * math.pi)
-						pos_log_data = get_pos()
+						#pos_log_data = get_pos()
 						get_camera_frame()
-						cx_val,cy_val,area_val,num_objects_val = get_object(frame)
+						cx_val,cy_val,area_val,num_objects_val = get_object(frame)						
 						if(num_objects_val>0):
 							balloon_found = True # If we have something, we'll assume we've found the balloon
+							print(' Num Obj: '+repr(num_objects_val)+'----------------------------------------------------------------')
 						if(area_val>area_max_val): # If our current imag has a bigger red area, update our estimate
 							area_max_val = area_val
 							img_balloon_ber = -1*(cx_val-cx_mid)*cx_fov/640 # Basic camera model, somebody check this
 							max_bear_val = pos_log_data[3]+img_balloon_ber
+							print(' Bear Com: '+repr(max_bear_val)+' Max Area: '+repr(area_max_val))
 
 			# Guide
 			if sequence == 2:
@@ -284,15 +267,12 @@ while(1):
 					seq2_cnt += 1 # just update the sequence if the loop is closed for 3 software loops
 					if seq2_cnt == 5:
 						seq2_cnt = 0
-						pos_log_data = get_pos()
+						#pos_log_data = get_pos()
 						get_camera_frame()
 						cx_val,cy_val,area_val,num_objects_val = get_object(frame)
 						if(num_objects_val>0):					# If we've seen something, adjust our pointing
 							img_balloon_ber = -1*(cx_val-cx_mid)*cx_fov/640    # Basic camera model, somebody check this
 							max_bear_val = pos_log_data[3]+img_balloon_ber
-						else:
-							balloon_found = False 				# If we don't see anything go back to coarse search
-							sequence = 1
 						if(max_bear_val<0):
 							max_bear_val+=(2*math.pi) 		# Keep it positive
 						yaw_com = max_bear_val
@@ -307,7 +287,10 @@ while(1):
 							d_y = guid_adv*math.sin(max_bear_val)    
 							x_com = x_pos+d_x			 
 							y_com = y_pos+d_y	
-					
+					else:
+						balloon_found = False 
+						print('oh')				# If we don't see anything go back to coarse search
+						sequence = 1
 			
 			#Seq. 4: Terminal
 			if sequence == 3:
@@ -327,11 +310,11 @@ while(1):
 
 			# Land
 			if sequence == 5: 
-				controller.vidro.set_rc_throttle(0)# it'll round it to minimum which is like 1100
+				#controller.vidro.set_rc_throttle(0)# it'll round it to minimum which is like 1100
 				logging_on = False
 				sequence = 5
 
-			if vidro.current_rc_channels[5] < 1600:
+			if False:
 				reset_val = 1
 				print('Gonna Reset!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
 
