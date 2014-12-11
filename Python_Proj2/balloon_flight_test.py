@@ -166,39 +166,34 @@ while(1):
 			#pwm_logger(logging_on,pwm_log_data)
 			#pos_logger(logging_on,pos_log_data)
 			#err_logger(logging_on,err_log_data)
-			print(' Yaw Pos: '+repr(pos_log_data[3])+' Yaw_err: '+repr(err_log_data[5])+' Yaw_pwm: '+repr(pwm_log_data[3]))
+			print(' X Pos: '+repr(pos_log_data[0])+' X_err: '+repr(err_log_data[0])+' Roll_pwm: '+repr(pwm_log_data[0])+' Y Pos: '+repr(pos_log_data[1])+' Y_err: '+repr(err_log_data[1])+' Pitch_pwm: '+repr(pwm_log_data[1]))
 
 			#On ground -> Takeoff to 1 m
 			if sequence == 0:
 				alt_com = 1000
-				yaw_com = 0.3
+				yaw_com = 0
 				x_com = 0
 				y_com = 0
 				#sequence_logger(logging_on,sequence)
 				check_val = err_check(err_log_data,pos_bound_err,yaw_bound_err)
 				if (check_val):# Closes Error for takeoff
+					yaw_com +=0.3	
+					if yaw_com > 2 * math.pi:
+						yaw_com -= (2 * math.pi)				
 					seq0_cnt += 1 # just update the sequence if the loop is closed for 3 software loops
 					print('update')
-					if seq0_cnt == 10:
+					if seq0_cnt == 5:
 						sequence = 0
 
 			#Turn in center of space
 			if sequence == 1:
-				# Hold her steady while we img proc					
-				vidro.set_rc_throttle(vidro.base_rc_throttle)
-				vidro.set_rc_roll(vidro.base_rc_roll)
-				vidro.set_rc_pitch(vidro.base_rc_pitch)
-				vidro.set_rc_yaw(vidro.base_rc_yaw)
-				#error_z = controller.rc_alt(1000)
-				#error_yaw = controller.rc_yaw(yaw)
-				#error_x_y = controller.rc_xy(0,0)
-				error_z = 0
-				error_yaw = 0
-				err_x = 0#error_x_y[0]
-				err_y = 0#error_x_y[1]
+				alt_com = 1000
+				yaw_com = 0
+				x_com = 0
+				y_com = 0
 				print('Seq: '+repr(sequence)+' Err Z: '+repr(error_z)+' Err Yaw: '+repr(error_yaw)+' Err X: '+repr(err_x)+' Err y: '+repr(err_y))
 				if ((abs(error_z) < pos_bound_err) and (abs(error_yaw) < yaw_bound_err) and (abs(err_y) < pos_bound_err) and (abs(err_x) < pos_bound_err)):# Closes Error for takeoff
-					yaw +=1
+					yaw_com +=0.3
 					seq1_cnt += 1 # again just update the sequence once we've closed the loop
 					print('update')
 					if yaw > 2 * math.pi:
