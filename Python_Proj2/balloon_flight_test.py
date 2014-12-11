@@ -7,6 +7,7 @@ import sys, math, time
 import socket, struct, threading
 import numpy as np
 import cv2
+import logging
 
 
 #Setup of vidro and controller
@@ -30,6 +31,10 @@ pos_bound_err = 100
 yaw_bound_err = 0.2
 yaw = 0
 reset_val = 1
+time_begin = time.time()
+#Start of a log
+logging.basicConfig(filename='bft.log', level=logging.DEBUG)
+
 print('Heading to while')
 while(1):
 ##        try:
