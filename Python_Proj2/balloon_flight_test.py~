@@ -9,14 +9,12 @@ import numpy as np
 import cv2
 import logging
 
-
 #Setup of vidro and controller
 vidro = Vidro(False, 1)
 flight_ready = vidro.connect()
 controller = PositionController(vidro)
 
 start_time = time.time()
-previous_time = time.time()
 
 cycle = 0
 
@@ -32,6 +30,9 @@ yaw_bound_err = 0.2
 yaw = 0
 reset_val = 1
 time_begin = time.time()
+#Start of a log
+logging.basicConfig(filename='bft_log.log', level=logging.INFO)
+
 print('Heading to while')
 while(1):
 ##        try:

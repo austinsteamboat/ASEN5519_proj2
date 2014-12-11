@@ -25,6 +25,14 @@ V_upper = 255 # 255
 #Start of a log
 logging.basicConfig(filename='btd.log', level=logging.INFO)
 
+logging_on = True
+
+def img_logger(log_true):
+	if log_true:
+		msg_type = ' IMG '
+		log_time = time.time()-start_time
+		logging.info(' Msg_Type: '+msg_type+' Time: '+repr(log_time)' Cx: '+repr(cx)+' Cy: '+repr(cy)+' Num Objs: '+repr(num_objects)+' Area: '+repr(area_max))
+
 def get_object(frame):
 	hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 	lower = np.array([H_lower, S_lower, V_lower], dtype=np.uint8)
@@ -60,9 +68,8 @@ def get_object(frame):
 		cy = 0
 	cv2.circle(frame,(cx,cy),5,(255,0,0),-1)
 	print 'Num Objs: ',repr(num_objects),' Cx: ',repr(cx),' Cy: ',repr(cy),' Area: ',repr(area_max)
-	logging.info(' Cx: '+repr(cx)+' Cy: '+repr(cy)+' Num Objs: '+repr(num_objects))
 	#image_data = [cx ,cy, area, min_con_x, max_con_x, min_con_y, max_con_y, out_of_bounds, num_objects]
-
+	img_logger(logging_on)
 
 def get_camera_frame():
 	global frame
