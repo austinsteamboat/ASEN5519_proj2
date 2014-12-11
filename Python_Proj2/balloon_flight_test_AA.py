@@ -235,7 +235,7 @@ while(1):
 			#pwm_logger(logging_on,pwm_log_data)
 			#pos_logger(logging_on,pos_log_data)
 			#err_logger(logging_on,err_log_data)
-			print('seq: '+repr(sequence)+' X_err: '+repr(err_log_data[0])+' Y_err: '+repr(err_log_data[1])+' Z_err: '+repr(err_log_data[2])+' Yaw_err: '+repr(err_log_data[3]))
+			print('seq: '+repr(sequence)+' X_err: '+repr(err_log_data[0])+' Y_err: '+repr(err_log_data[1])+' Z_err: '+repr(err_log_data[2])+' Yaw_err: '+repr(err_log_data[5]))
 			#On ground -> Takeoff to 1 m
 			if sequence == 0:
 				alt_com = 1000
@@ -244,10 +244,7 @@ while(1):
 				y_com = 0
 				#sequence_logger(logging_on,sequence)
 				check_val = err_check(err_log_data,pos_bound_err,yaw_bound_err)
-				if (check_val):# Closes Error 
-					yaw_com +=0.3	
-					if yaw_com > 2 * math.pi:
-						yaw_com -= (2 * math.pi)				
+				if (check_val):# Closes Error 				
 					seq0_cnt += 1 # just update the sequence if the loop is closed for 3 software loops
 					if seq0_cnt == 10:
 						sequence = 1
@@ -257,16 +254,17 @@ while(1):
 				alt_com = 1000
 				#sequence_logger(logging_on,sequence)
 				check_val = err_check(err_log_data,pos_bound_err,yaw_bound_err)
-				if (check_val):# Closes Error 
-					yaw_com +=0.4						
-					if ((yaw_com > (2 * math.pi)) and balloon_found):########################################################
-						sequence = 2						
-						yaw_com = max_bear_val
-					else:	
-						yaw_com -= (2 * math.pi)			
+				if (check_val):# Closes Error 			
 					seq1_cnt += 1 # just update the sequence if the loop is closed for 3 software loops
 					if seq1_cnt == 5:
 						seq1_cnt = 0
+						yaw_com +=0.4						
+						if (yaw_com > (2 * math.pi)):########################################################
+							if(balloon_found):							
+								sequence = 2						
+								yaw_com = max_bear_val
+							else:	
+								yaw_com -= (2 * math.pi)
 						pos_log_data = get_pos()
 						get_camera_frame()
 						cx_val,cy_val,area_val,num_objects_val = get_object(frame)
