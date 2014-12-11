@@ -23,6 +23,12 @@ H_upper = 182 # 186
 S_upper = 255 # 255
 V_upper = 255 # 255
 
+
+cx_mid = 640/2 # Given the camera resolution
+cy_mid = 480/2 # Given the camera resoltuion
+guid_adv = 300	
+balloon_area_max_thresh = 150000 # Size for estimating we're at the balloon
+cx_fov = 1.15192 # Camera azimuth field of view in radians(66 degrees)
 #Start of a log
 logging.basicConfig(filename='btd.log', level=logging.INFO)
 
@@ -82,9 +88,18 @@ def get_camera_frame():
 while(1):
 	time_prev = time_new
 	time_new = time.time()
-	print('Diff Time: '+repr(time_new-time_prev))
 	get_camera_frame()
 	get_object(frame)
+	# Grab our current x,y position          
+	x_pos=0#vidro.get_position()[0]            
+	y_pos=0#vidro.get_position()[1]            
+	# Calculate step towards balloon
+	img_balloon_ber = (cx_val-cx_mid)*cx_fov/640         
+	d_x = guid_adv*math.cos(max_bear_val)    
+	d_y = guid_adv*math.sin(max_bear_val)    
+	x_com = x_pos+d_x			 
+	y_com = y_pos+d_y
+	print(' img_balloon_ber: '+repr(img_balloon_ber)+' x_com: '+repr(x_com)+' y_com: '+repr(y_com))
 	#cv2.imshow('frame',frame)
 	k = cv2.waitKey(5) & 0xFF
 	if k == 27:
