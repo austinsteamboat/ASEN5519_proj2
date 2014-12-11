@@ -11,34 +11,30 @@ import logging
 import numpy as np
 import cv2
 
-cap = cv2.VideoCapture(1)
-global start_time
-start_time= time.time()
-time_new = 0
-H_lower = 20 #157
-S_lower = 114 #149
-V_lower = 121 #67
-
-H_upper = 182 # 186
-S_upper = 255 # 255
-V_upper = 255 # 255
-
-
 cx_mid = 640/2 # Given the camera resolution
 cy_mid = 480/2 # Given the camera resoltuion
 guid_adv = 300	
 balloon_area_max_thresh = 150000 # Size for estimating we're at the balloon
 cx_fov = 1.15192 # Camera azimuth field of view in radians(66 degrees)
 #Start of a log
-logging.basicConfig(filename='btd.log', level=logging.INFO)
 
-logging_on = True
+##########################
+# Image Processing Vars: #
+##########################
 
-def img_logger(log_true,cx,cy,num_objects,area_max):
-	if log_true:
-		msg_type = ' IMG '
-		log_time = time.time()-start_time
-		logging.info(' Msg_Type: '+msg_type+' Time: '+repr(log_time)+' Cx: '+repr(cx)+' Cy: '+repr(cy)+' Num Objs: '+repr(num_objects)+' Area: '+repr(area_max))
+cap = cv2.VideoCapture(1)
+# Color Filters
+H_lower = 0 #157
+S_lower = 149 #149
+V_lower = 67 #67
+
+H_upper = 186 # 186
+S_upper = 255 # 255
+V_upper = 255 # 255
+
+###############################
+# Image Processing Functions: #
+###############################
 
 def get_object(frame):
 	hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
@@ -74,9 +70,10 @@ def get_object(frame):
 		cx = 0
 		cy = 0
 	cv2.circle(frame,(cx,cy),5,(255,0,0),-1)
-	print 'Num Objs: ',repr(num_objects),' Cx: ',repr(cx),' Cy: ',repr(cy),' Area: ',repr(area_max)
+	#print 'Num Objs: ',repr(num_objects),' Cx: ',repr(cx),' Cy: ',repr(cy),' Area: ',repr(area_max)
 	#image_data = [cx ,cy, area, min_con_x, max_con_x, min_con_y, max_con_y, out_of_bounds, num_objects]
-	img_logger(logging_on,cx,cy,num_objects,area_max)
+	image_data = [cx,cy,area_max,num_objects]
+	return image_data
 
 def get_camera_frame():
 	global frame
@@ -86,20 +83,22 @@ def get_camera_frame():
 	new_frame = True
 
 while(1):
-	time_prev = time_new
-	time_new = time.time()
 	get_camera_frame()
-	get_object(frame)
+	cx_val,cy_val,area_val,num_objects_val = get_object(frame)
 	# Grab our current x,y position          
 	x_pos=0#vidro.get_position()[0]            
-	y_pos=0#vidro.get_position()[1]            
+	y_pos=0#vidro.get_position()[1]  
+	yaw_pos = 0          
 	# Calculate step towards balloon
-	img_balloon_ber = (cx_val-cx_mid)*cx_fov/640         
+	img_balloon_ber = -1*(cx_val-cx_mid)*cx_fov/640    
+	max_bear_val = yaw_pos+img_balloon_ber     
 	d_x = guid_adv*math.cos(max_bear_val)    
 	d_y = guid_adv*math.sin(max_bear_val)    
 	x_com = x_pos+d_x			 
 	y_com = y_pos+d_y
-	print(' img_balloon_ber: '+repr(img_balloon_ber)+' x_com: '+repr(x_com)+' y_com: '+repr(y_com))
+	if((num_objects_val>0) and area_val>20000):
+		cv2.imwrite("test_pic.jpg",frame) # For now, just take a picture
+	print(' img_balloon_ber: '+repr(img_balloon_ber)+' x_com: '+repr(x_com)+' y_com: '+repr(y_com)+' Area: '+repr(area_val))
 	#cv2.imshow('frame',frame)
 	k = cv2.waitKey(5) & 0xFF
 	if k == 27:

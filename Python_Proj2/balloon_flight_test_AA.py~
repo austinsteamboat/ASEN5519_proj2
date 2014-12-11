@@ -274,7 +274,7 @@ while(1):
 							balloon_found = True # If we have something, we'll assume we've found the balloon
 						if(area_val>area_max_val): # If our current imag has a bigger red area, update our estimate
 							area_max_val = area_val
-							img_balloon_ber = (cx_val-cx_mid)*cx_fov/640 # Basic camera model, somebody check this
+							img_balloon_ber = -1*(cx_val-cx_mid)*cx_fov/640 # Basic camera model, somebody check this
 							max_bear_val = pos_log_data[3]+img_balloon_ber
 
 			# Guide
@@ -290,7 +290,7 @@ while(1):
 						get_camera_frame()
 						cx_val,cy_val,area_val,num_objects_val = get_object(frame)
 						if(num_objects_val>0):					# If we've seen something, adjust our pointing
-							img_balloon_ber = (cx_val-cx_mid)*cx_fov/640    # Basic camera model, somebody check this
+							img_balloon_ber = -1*(cx_val-cx_mid)*cx_fov/640    # Basic camera model, somebody check this
 							max_bear_val = pos_log_data[3]+img_balloon_ber
 						if(max_bear_val<0):
 							max_bear_val+=(2*math.pi) 		# Keep it positive
