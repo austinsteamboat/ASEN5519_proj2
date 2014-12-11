@@ -269,7 +269,7 @@ class PositionController:
         if abs(self.error_roll) < 300:
             self.I_error_roll = self.I_error_roll + self.error_roll*delta_t
         else:
-            self.I_eror_roll = 0
+            self.I_error_roll = 0
 
         if abs(self.error_pitch) < 300:
             self.I_error_pitch = self.I_error_pitch + self.error_pitch*delta_t

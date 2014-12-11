@@ -30,7 +30,7 @@ seq0_cnt = 0
 seq1_cnt = 0
 seq2_cnt = 0
 seq3_cnt = 0
-pos_bound_err = 100
+pos_bound_err = 150
 yaw_bound_err = 0.2
 logging_on = True
 yaw = 0
@@ -55,10 +55,16 @@ def get_pwm():
 	return pwm_data
 
 def get_err(x_com,y_com,z_com,yaw_com):
-	error_z = controller.rc_alt(z_com)
-	error_yaw = controller.rc_yaw(yaw_com)
-	error_x_y = controller.rc_xy(x_com, y_com)
-	error_data = [error_x_y[2],error_x_y[3],error_z,error_x_y[0],error_x_y[1],error_yaw]
+	try:
+		error_z = controller.rc_alt(z_com)
+		error_yaw = controller.rc_yaw(yaw_com)
+		error_x_y = controller.rc_xy(x_com, y_com)
+		error_data = [error_x_y[2],error_x_y[3],error_z,error_x_y[0],error_x_y[1],error_yaw]
+	except:
+		error_z = 0
+		error_yaw = 0
+		error_x_y=[0,0,0,0]
+		error_data = [error_x_y[2],error_x_y[3],error_z,error_x_y[0],error_x_y[1],error_yaw]
 	return error_data
 
 def logger(log_true,sequence,pwm_data,pos_data,error_data):
@@ -97,9 +103,12 @@ def err_check(error_data,pos_bound_err,yaw_bound_err):
 	error_y = error_data[1]
 	error_z = error_data[2]
 	error_yaw = error_data[5]
-	if ((abs(error_z) < pos_bound_err) and (abs(error_yaw) < yaw_bound_err) and (abs(error_y) < pos_bound_err) and (abs(error_x) < pos_bound_err)):
-		x_out = True
-	else:
+	try:
+		if ((abs(error_z) < pos_bound_err) and (abs(error_yaw) < yaw_bound_err) and (abs(error_y) < pos_bound_err) and (abs(error_x) < pos_bound_err)):
+			x_out = True
+		else:
+			x_out = False
+	except:
 		x_out = False
 	return x_out
 
@@ -162,10 +171,10 @@ while(1):
 			#On ground -> Takeoff to 1 m
 			if sequence == 0:
 				alt_com = 1000
-				yaw_com = 0
+				yaw_com = 0.3
 				x_com = 0
 				y_com = 0
-				sequence_logger(logging_on,sequence)
+				#sequence_logger(logging_on,sequence)
 				check_val = err_check(err_log_data,pos_bound_err,yaw_bound_err)
 				if (check_val):# Closes Error for takeoff
 					seq0_cnt += 1 # just update the sequence if the loop is closed for 3 software loops

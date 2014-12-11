@@ -8,17 +8,6 @@ import socket, struct, threading
 import numpy as np
 import cv2
 
-
-
-
-
-H_lower = 0 #157
-S_lower = 149 #149
-V_lower = 67 #67
-
-H_upper = 14 # 186
-S_upper = 255 # 255
-V_upper = 255 # 255
 ###############################
 # Image Processing Functions: #
 ###############################
