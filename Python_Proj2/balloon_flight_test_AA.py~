@@ -235,7 +235,7 @@ while(1):
 			#pwm_logger(logging_on,pwm_log_data)
 			#pos_logger(logging_on,pos_log_data)
 			#err_logger(logging_on,err_log_data)
-			print(' X Pos: '+repr(pos_log_data[0])+' X_err: '+repr(err_log_data[0])+' Roll_pwm: '+repr(pwm_log_data[0])+' Y Pos: '+repr(pos_log_data[1])+' Y_err: '+repr(err_log_data[1])+' Pitch_pwm: '+repr(pwm_log_data[1]))
+			print('seq: '+repr(sequence)+' X_err: '+repr(err_log_data[0])+' Y_err: '+repr(err_log_data[1])+' Pitch_pwm: '+repr(pwm_log_data[1]))
 			#On ground -> Takeoff to 1 m
 			if sequence == 0:
 				alt_com = 1000

@@ -28,7 +28,7 @@ H_lower = 0 #157
 S_lower = 149 #149
 V_lower = 67 #67
 
-H_upper = 186 # 186
+H_upper = 14 # 186
 S_upper = 255 # 255
 V_upper = 255 # 255
 
@@ -99,7 +99,7 @@ while(1):
 	if((num_objects_val>0) and area_val>20000):
 		cv2.imwrite("test_pic.jpg",frame) # For now, just take a picture
 	print(' img_balloon_ber: '+repr(img_balloon_ber)+' x_com: '+repr(x_com)+' y_com: '+repr(y_com)+' Area: '+repr(area_val))
-	#cv2.imshow('frame',frame)
+	cv2.imshow('frame',frame)
 	k = cv2.waitKey(5) & 0xFF
 	if k == 27:
 		break

@@ -182,9 +182,9 @@ while(1):
 ##        except:
 ##                print('RC 5 Vidro Update '+repr(vidro.current_rc_channels[4])+' RC 6 Vidro Update '+repr(vidro.current_rc_channels[5]))
 	vidro.update_mavlink() # Grab updated rc channel values. This is the right command for it, but it doesn't always seem to update RC channels
-	while vidro.current_rc_channels[4] > 1600 and flight_ready == True:
+	while True:
 		if(reset_val):
-			print 'RESET!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
+			#print 'RESET!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
 			controller.vidro.rc_throttle_reset()
 			controller.vidro.rc_yaw_reset()
 			controller.vidro.rc_pitch_reset()
@@ -219,10 +219,10 @@ while(1):
 		balloon_area_max_thresh = 150000 # Size for estimating we're at the balloon
 		cx_fov = 1.15192 # Camera azimuth field of view in radians(66 degrees)
 		#Update of gains before going into control loop
-		if vidro.current_rc_channels[5] > 1600:
+		if True:
 			controller.update_gains()
 
-		while vidro.current_rc_channels[5] > 1600:
+		while True:
 			# Update Commands
 			err_log_data = get_err(x_com,y_com,alt_com,yaw_com)
 			# Grab updated rc channel values
@@ -235,7 +235,7 @@ while(1):
 			#pwm_logger(logging_on,pwm_log_data)
 			#pos_logger(logging_on,pos_log_data)
 			#err_logger(logging_on,err_log_data)
-			print('seq: '+repr(sequence)+' X_err: '+repr(err_log_data[0])+' Y_err: '+repr(err_log_data[1])+' Z_err: '+repr(err_log_data[2])+' Yaw_err: '+repr(err_log_data[3]))
+			print('seq: '+repr(sequence)+' X_err: '+repr(err_log_data[0])+' Y_err: '+repr(err_log_data[1])+' Z_err: '+repr(err_log_data[2])+' Yaw_err: '+repr(err_log_data[5]))
 			#On ground -> Takeoff to 1 m
 			if sequence == 0:
 				alt_com = 1000
@@ -244,10 +244,7 @@ while(1):
 				y_com = 0
 				#sequence_logger(logging_on,sequence)
 				check_val = err_check(err_log_data,pos_bound_err,yaw_bound_err)
-				if (check_val):# Closes Error 
-					yaw_com +=0.3	
-					if yaw_com > 2 * math.pi:
-						yaw_com -= (2 * math.pi)				
+				if (check_val):# Closes Error 				
 					seq0_cnt += 1 # just update the sequence if the loop is closed for 3 software loops
 					if seq0_cnt == 10:
 						sequence = 1
@@ -255,6 +252,7 @@ while(1):
 			# Coarse Search
 			if sequence == 1:
 				alt_com = 1000
+				print('Yaw com: '+repr(yaw_com))
 				#sequence_logger(logging_on,sequence)
 				check_val = err_check(err_log_data,pos_bound_err,yaw_bound_err)
 				if (check_val):# Closes Error 
@@ -332,7 +330,7 @@ while(1):
 				logging_on = False
 				sequence = 5
 
-			if vidro.current_rc_channels[5] < 1600:
+			if False:
 				reset_val = 1
 				print('Gonna Reset!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
 
