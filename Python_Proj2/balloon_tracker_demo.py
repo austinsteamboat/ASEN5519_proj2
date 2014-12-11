@@ -12,7 +12,8 @@ import numpy as np
 import cv2
 
 cap = cv2.VideoCapture(1)
-time_prev = time.time()
+global start_time
+start_time= time.time()
 time_new = 0
 H_lower = 20 #157
 S_lower = 114 #149
@@ -27,11 +28,11 @@ logging.basicConfig(filename='btd.log', level=logging.INFO)
 
 logging_on = True
 
-def img_logger(log_true):
+def img_logger(log_true,cx,cy,num_objects,area_max):
 	if log_true:
 		msg_type = ' IMG '
 		log_time = time.time()-start_time
-		logging.info(' Msg_Type: '+msg_type+' Time: '+repr(log_time)' Cx: '+repr(cx)+' Cy: '+repr(cy)+' Num Objs: '+repr(num_objects)+' Area: '+repr(area_max))
+		logging.info(' Msg_Type: '+msg_type+' Time: '+repr(log_time)+' Cx: '+repr(cx)+' Cy: '+repr(cy)+' Num Objs: '+repr(num_objects)+' Area: '+repr(area_max))
 
 def get_object(frame):
 	hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
@@ -69,7 +70,7 @@ def get_object(frame):
 	cv2.circle(frame,(cx,cy),5,(255,0,0),-1)
 	print 'Num Objs: ',repr(num_objects),' Cx: ',repr(cx),' Cy: ',repr(cy),' Area: ',repr(area_max)
 	#image_data = [cx ,cy, area, min_con_x, max_con_x, min_con_y, max_con_y, out_of_bounds, num_objects]
-	img_logger(logging_on)
+	img_logger(logging_on,cx,cy,num_objects,area_max)
 
 def get_camera_frame():
 	global frame
