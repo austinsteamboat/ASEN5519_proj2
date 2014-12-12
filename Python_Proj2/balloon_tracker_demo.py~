@@ -96,10 +96,10 @@ while(1):
 	d_y = guid_adv*math.sin(max_bear_val)    
 	x_com = x_pos+d_x			 
 	y_com = y_pos+d_y
-	if((num_objects_val>0) and area_val>20000):
-		cv2.imwrite("test_pic.jpg",frame) # For now, just take a picture
+	if((num_objects_val>0) and area_val>5000):
+		cv2.imwrite("test2_pic.jpg",frame) # For now, just take a picture
 	print(' img_balloon_ber: '+repr(img_balloon_ber)+' x_com: '+repr(x_com)+' y_com: '+repr(y_com)+' Area: '+repr(area_val))
-	#cv2.imshow('frame',frame)
+	cv2.imshow('frame',frame)
 	k = cv2.waitKey(5) & 0xFF
 	if k == 27:
 		break
